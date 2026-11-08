@@ -1,0 +1,11 @@
+{
+  "name": "scripture-phrase",
+  "private": true,
+  "description": "Scripture Phrase - Bible & Lutheran catch phrase party game (PWA)",
+  "scripts": {
+    "build:css": "tailwindcss -i src/tailwind.input.css -o tailwind.css --content index.html --minify"
+  },
+  "devDependencies": {
+    "tailwindcss": "3.4.17"
+  }
+}

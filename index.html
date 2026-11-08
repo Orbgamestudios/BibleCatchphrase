@@ -2,10 +2,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Scripture Phrase - Bible & Lutheran Catch Phrase Game</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Scripture Phrase">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <!-- Tailwind CSS (pre-built locally so the game works offline; rebuild with `npm run build:css`) -->
+    <link rel="stylesheet" href="tailwind.css">
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Google Fonts -->
@@ -114,6 +123,164 @@
             background: #475569;
             border-radius: 9999px;
         }
+
+        /* =====================================================================
+           PHONE / LANDSCAPE PWA LAYOUT
+        ===================================================================== */
+        html, body { overscroll-behavior: none; }
+        body {
+            padding-top: max(0.75rem, env(safe-area-inset-top));
+            padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+            padding-left: max(0.75rem, env(safe-area-inset-left));
+            padding-right: max(0.75rem, env(safe-area-inset-right));
+        }
+        button { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+
+        /* ---- In-round screen: only SKIP | WORD | CORRECT ---- */
+        body.playing header,
+        body.playing footer,
+        body.playing #scoreboard { display: none !important; }
+        body.playing { overflow: hidden; }
+
+        #panel-active-play:not(.hidden) {
+            position: fixed;
+            inset: 0;
+            z-index: 40;
+            display: grid;
+            grid-template-columns: minmax(104px, 21vw) 1fr minmax(104px, 21vw);
+            grid-template-rows: 1fr;
+            gap: clamp(8px, 2vw, 16px);
+            padding: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right))
+                     max(10px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+            background: radial-gradient(circle at top, #1e293b 0%, #0f172a 65%, #020617 100%);
+        }
+        .play-btn {
+            border-radius: 1.5rem;
+            color: #fff;
+            font-weight: 800;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: clamp(1rem, 3.2vw, 1.6rem);
+            letter-spacing: 0.06em;
+            cursor: pointer;
+            min-height: 0;
+        }
+        .play-btn i { font-size: clamp(1.6rem, 6vw, 2.6rem); }
+        .play-card {
+            position: relative;
+            border-radius: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            min-width: 0;
+            min-height: 0;
+            padding: clamp(14px, 3vw, 28px);
+        }
+        .play-phrase-box {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            overflow: hidden;
+        }
+        #card-phrase-text {
+            font-family: 'Cinzel', serif;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1.1;
+            letter-spacing: -0.01em;
+            overflow-wrap: break-word;
+            word-break: normal;
+            hyphens: auto;
+            max-width: 100%;
+        }
+        .play-hint {
+            margin-top: 0.6em;
+            font-size: clamp(0.8rem, 2.2vw, 1rem);
+            font-weight: 500;
+            color: rgba(69, 26, 3, 0.8);
+            max-width: 36rem;
+        }
+        .play-progress {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 6px;
+            background: rgba(120, 53, 15, 0.15);
+        }
+        .play-progress > div {
+            height: 100%;
+            background: linear-gradient(90deg, #34d399, #fbbf24, #f43f5e);
+            transition: width 0.2s linear;
+        }
+        .play-seconds {
+            position: absolute;
+            top: 12px; right: 14px;
+            font-weight: 800;
+            font-size: 0.8rem;
+            color: #78350f;
+        }
+        .play-exit {
+            position: absolute;
+            top: 6px; left: 6px;
+            width: 34px; height: 34px;
+            border-radius: 9999px;
+            color: rgba(120, 53, 15, 0.45);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem;
+        }
+        .play-exit:active { background: rgba(120, 53, 15, 0.12); }
+
+        /* Holding the phone upright: word on top, buttons below */
+        @media (orientation: portrait) {
+            #panel-active-play:not(.hidden) {
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: 1fr minmax(96px, 22vh);
+            }
+            #panel-active-play .play-card { grid-column: 1 / -1; grid-row: 1; }
+            #panel-active-play #btn-skip-word { grid-column: 1; grid-row: 2; }
+            #panel-active-play #btn-got-it { grid-column: 2; grid-row: 2; }
+            .play-btn { font-size: clamp(1rem, 5vw, 1.5rem); }
+            .play-btn i { font-size: clamp(1.4rem, 7vw, 2.2rem); }
+        }
+
+        /* ---- Short landscape screens (phones on their side): compact everything else ---- */
+        @media (max-height: 520px) {
+            body { padding-top: max(0.4rem, env(safe-area-inset-top)); padding-bottom: max(0.4rem, env(safe-area-inset-bottom)); }
+            header { padding-top: 0.25rem !important; padding-bottom: 0.25rem !important; }
+            header .w-10 { width: 2rem; height: 2rem; }
+            header p { display: none !important; }
+            footer, .compact-hide { display: none !important; }
+            main { padding-top: 0.4rem !important; padding-bottom: 0.4rem !important; }
+            #screen-setup > div { padding: 0.75rem !important; }
+            #screen-setup > div > * + * { margin-top: 0.6rem !important; }
+            #screen-setup .banner { padding-bottom: 0.4rem !important; }
+            #screen-setup .banner h2 { font-size: 1.15rem !important; }
+            #screen-setup .team-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+            #screen-setup > div > .banner + * { margin-top: 0 !important; }
+            #category-grid { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
+            #btn-start-match { position: sticky; bottom: 0.25rem; padding-top: 0.7rem !important; padding-bottom: 0.7rem !important; z-index: 5; }
+            #screen-game > * + * { margin-top: 0.5rem !important; }
+            #scoreboard { padding: 0.35rem !important; }
+            #panel-ready, #panel-buzzer, #panel-victory { padding: 0.9rem !important; }
+            #panel-ready > * + *, #panel-buzzer > * + *, #panel-victory > * + * { margin-top: 0.6rem !important; }
+            #panel-buzzer .award-box { padding: 0.6rem !important; }
+            #panel-buzzer .award-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+            #panel-victory .victory-actions { flex-direction: row !important; }
+            body.buzzing header, body.buzzing #scoreboard { display: none !important; }
+            .compact-show { display: block !important; }
+            #panel-buzzer h3 { font-size: 1.4rem !important; }
+            #panel-buzzer .award-grid button { padding-top: 0.8rem !important; padding-bottom: 0.8rem !important; }
+            #screen-setup .banner h2 { display: none !important; }
+            #screen-setup .banner { display: none !important; }
+            #btn-begin-timer { padding-top: 0.8rem !important; padding-bottom: 0.8rem !important; }
+        }
     </style>
 </head>
 <body class="flex flex-col min-h-screen justify-between p-3 sm:p-5">
@@ -175,20 +342,20 @@
             <div class="bg-slate-900/90 border border-slate-700/80 rounded-3xl p-4 sm:p-6 shadow-2xl backdrop-blur-md space-y-5">
 
                 <!-- Banner Header -->
-                <div class="text-center space-y-1.5 border-b border-slate-800 pb-4">
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-500/15 text-amber-300 border border-amber-400/30">
+                <div class="banner text-center space-y-1.5 border-b border-slate-800 pb-4">
+                    <span class="compact-hide inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-500/15 text-amber-300 border border-amber-400/30">
                         <i class="fa-solid fa-bolt"></i> Hot-Potato Team Party Game
                     </span>
                     <h2 class="font-cinzel text-2xl sm:text-3xl font-extrabold text-white">
                         Pass the Device Before the Buzzer!
                     </h2>
-                    <p class="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto">
-                        Sit in a circle alternating teams. Give clues so your team guesses the Bible or Lutheran phrase, then tap <strong class="text-emerald-400">GOT IT!</strong> and hand the device to the next player!
+                    <p class="compact-hide text-xs sm:text-sm text-slate-300 max-w-xl mx-auto">
+                        Sit in a circle alternating teams. Give clues so your team guesses the Bible or Lutheran phrase, then tap <strong class="text-emerald-400">CORRECT</strong> and hand the device to the next player!
                     </p>
                 </div>
 
                 <!-- Team Names Configuration -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div class="team-grid grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div class="bg-slate-800/70 border border-sky-500/30 rounded-2xl p-3">
                         <label for="input-team-a" class="block text-[11px] font-bold uppercase tracking-wider text-sky-400 mb-1">
                             <i class="fa-solid fa-shield-halved mr-1"></i> Team 1 Name
@@ -221,7 +388,7 @@
                 </div>
 
                 <!-- Game Settings Row -->
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
                     <!-- Round Duration -->
                     <div class="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-3">
                         <label for="select-timer" class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">
@@ -258,6 +425,17 @@
                             <option value="visible">Show Progress Bar &amp; Secs</option>
                         </select>
                     </div>
+
+                    <!-- Hint under the word -->
+                    <div class="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-3">
+                        <label for="select-hints" class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+                            <i class="fa-regular fa-lightbulb text-amber-400 mr-1"></i> Word Hints
+                        </label>
+                        <select id="select-hints" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-2 text-xs sm:text-sm font-semibold text-white outline-none">
+                            <option value="off" selected>Off (word only)</option>
+                            <option value="on">Show hint under word</option>
+                        </select>
+                    </div>
                 </div>
 
                 <!-- Start Game CTA -->
@@ -275,7 +453,7 @@
         <section id="screen-game" class="hidden w-full space-y-3 sm:space-y-4">
 
             <!-- SCOREBOARD BAR -->
-            <div class="grid grid-cols-3 items-center gap-2 bg-slate-900/90 border border-slate-700/80 rounded-2xl p-2.5 sm:p-3.5 shadow-lg">
+            <div id="scoreboard" class="grid grid-cols-3 items-center gap-2 bg-slate-900/90 border border-slate-700/80 rounded-2xl p-2.5 sm:p-3.5 shadow-lg">
                 <!-- Team A Score Box -->
                 <div class="flex items-center justify-between bg-sky-950/50 border border-sky-500/30 rounded-xl px-3 py-2">
                     <div class="truncate pr-1">
@@ -311,7 +489,7 @@
 
             <!-- SUB-STATE 2A: PRE-ROUND READY OVERLAY -->
             <div id="panel-ready" class="bg-slate-900/90 border border-slate-700/80 rounded-3xl p-6 sm:p-8 text-center space-y-5 shadow-2xl">
-                <div class="w-16 h-16 rounded-2xl bg-amber-500/20 border border-amber-400/40 text-amber-300 flex items-center justify-center mx-auto text-3xl shadow-inner">
+                <div class="compact-hide w-16 h-16 rounded-2xl bg-amber-500/20 border border-amber-400/40 text-amber-300 flex items-center justify-center mx-auto text-3xl shadow-inner">
                     <i class="fa-solid fa-hands-holding-circle"></i>
                 </div>
                 <div class="space-y-2">
@@ -321,8 +499,8 @@
                     <h3 class="font-cinzel text-2xl sm:text-3xl font-extrabold text-white">
                         Ready for Round <span id="ready-round-num">1</span>?
                     </h3>
-                    <p class="text-xs sm:text-sm text-slate-300 max-w-md mx-auto">
-                        Hand the device to the starting clue-giver. As soon as your team guesses the phrase, tap <strong class="text-emerald-400">GOT IT!</strong> and immediately pass the device to the other team!
+                    <p class="compact-hide text-xs sm:text-sm text-slate-300 max-w-md mx-auto">
+                        Hand the device to the starting clue-giver. As soon as your team guesses the phrase, tap <strong class="text-emerald-400">CORRECT</strong> and immediately pass the device to the other team!
                     </p>
                 </div>
                 <button id="btn-begin-timer" type="button"
@@ -332,91 +510,39 @@
                 </button>
             </div>
 
-            <!-- SUB-STATE 2B: ACTIVE HOT-POTATO CARD AREA -->
-            <div id="panel-active-play" class="hidden space-y-3 sm:space-y-4">
+            <!-- SUB-STATE 2B: ACTIVE ROUND (full screen: SKIP | WORD | CORRECT) -->
+            <div id="panel-active-play" class="hidden">
+                <button id="btn-skip-word" type="button" class="play-btn btn-skip" aria-label="Skip this word">
+                    <i class="fa-solid fa-forward"></i>
+                    <span>SKIP</span>
+                </button>
 
-                <!-- Timer Tempo & Controls Strip -->
-                <div class="flex items-center justify-between px-2 py-1.5 rounded-xl bg-slate-900/80 border border-slate-800">
-                    <div class="flex items-center gap-2">
-                        <span id="tick-indicator-dot" class="w-3 h-3 rounded-full bg-emerald-400 inline-block shadow-sm"></span>
-                        <span id="tempo-status-label" class="text-xs font-bold uppercase tracking-wider text-slate-300">
-                            Timer Ticking...
-                        </span>
-                        <span id="visible-seconds-badge" class="hidden text-xs font-extrabold text-amber-300 bg-slate-800 px-2 py-0.5 rounded-md border border-slate-700">
-                            60s
-                        </span>
+                <div id="phrase-card" class="parchment-card play-card">
+                    <!-- Only shown when "Show Progress Bar & Secs" is chosen in setup -->
+                    <div id="timer-progress-container" class="hidden play-progress">
+                        <div id="timer-progress-bar" style="width: 100%;"></div>
                     </div>
+                    <span id="visible-seconds-badge" class="hidden play-seconds">60s</span>
 
-                    <div class="flex items-center gap-3">
-                        <span class="text-xs font-semibold text-slate-400">
-                            Cleared: <strong id="round-cleared-count" class="text-emerald-400">0</strong>
-                        </span>
-                        <button id="btn-toggle-hint" type="button"
-                            class="text-xs font-bold px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 transition flex items-center gap-1">
-                            <i class="fa-regular fa-lightbulb"></i>
-                            <span id="hint-toggle-text">Hide Hint</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Optional Visible Countdown Progress Bar -->
-                <div id="timer-progress-container" class="hidden w-full h-2.5 bg-slate-800 rounded-full overflow-hidden border border-slate-700">
-                    <div id="timer-progress-bar" class="h-full bg-gradient-to-r from-emerald-400 via-amber-400 to-rose-500 transition-all duration-200" style="width: 100%;"></div>
-                </div>
-
-                <!-- THE PARCHMENT PHRASE CARD (Clean UI - No clutter/forbidden word tags) -->
-                <div id="phrase-card" class="parchment-card rounded-3xl p-6 sm:p-10 text-center min-h-[230px] sm:min-h-[270px] flex flex-col items-center justify-between relative overflow-hidden">
-                    <!-- Top Category Badge -->
-                    <div class="w-full flex items-center justify-center">
-                        <span id="card-category-badge" class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider bg-amber-900/15 text-amber-900 border border-amber-700/30">
-                            <i class="fa-solid fa-scroll"></i>
-                            <span>Old Testament</span>
-                        </span>
-                    </div>
-
-                    <!-- Center Target Phrase -->
-                    <div class="my-auto py-4 px-2 w-full">
-                        <h2 id="card-phrase-text" class="font-cinzel font-extrabold text-3xl sm:text-5xl text-slate-900 tracking-tight leading-tight break-words">
-                            Burning Bush
-                        </h2>
-
-                        <!-- Optional Helpful Context Hint -->
-                        <p id="card-hint-text" class="mt-3 text-sm sm:text-base font-medium text-amber-950/80 bg-amber-500/15 border border-amber-600/20 rounded-xl px-3.5 py-2 max-w-lg mx-auto">
-                            A plant on fire that didn't burn up when God spoke to Moses
-                        </p>
-                    </div>
-
-                    <!-- Subtle Pass Reminder -->
-                    <div class="text-[11px] font-bold uppercase tracking-widest text-amber-900/60">
-                        Describe it to your team &bull; Pass after they guess!
-                    </div>
-                </div>
-
-                <!-- BIG ACTION BUTTONS (SKIP & GOT IT) -->
-                <div class="grid grid-cols-5 gap-3 sm:gap-4 pt-1">
-                    <button id="btn-skip-word" type="button"
-                        class="col-span-2 btn-skip text-white font-extrabold py-4 sm:py-5 px-4 rounded-2xl flex flex-col items-center justify-center gap-1 cursor-pointer">
-                        <div class="flex items-center gap-2 text-base sm:text-lg">
-                            <i class="fa-solid fa-forward"></i>
-                            <span>SKIP</span>
-                        </div>
-                        <span class="text-[10px] text-slate-300 font-medium uppercase tracking-wider">New Card (S / &rarr;)</span>
+                    <button id="btn-exit-round" type="button" class="play-exit" aria-label="Stop this round" title="Stop this round">
+                        <i class="fa-solid fa-xmark"></i>
                     </button>
 
-                    <button id="btn-got-it" type="button"
-                        class="col-span-3 btn-got-it text-white font-extrabold py-4 sm:py-5 px-4 rounded-2xl flex flex-col items-center justify-center gap-1 cursor-pointer">
-                        <div class="flex items-center gap-2 text-lg sm:text-2xl tracking-wide">
-                            <i class="fa-solid fa-check-double"></i>
-                            <span>GOT IT! (NEXT)</span>
-                        </div>
-                        <span class="text-[10px] text-emerald-100 font-semibold uppercase tracking-wider">Pass Device! (Space / Enter)</span>
-                    </button>
+                    <div id="phrase-fit-box" class="play-phrase-box">
+                        <h2 id="card-phrase-text">Burning Bush</h2>
+                        <p id="card-hint-text" class="hidden play-hint"></p>
+                    </div>
                 </div>
+
+                <button id="btn-got-it" type="button" class="play-btn btn-got-it" aria-label="Correct, next word">
+                    <i class="fa-solid fa-check"></i>
+                    <span>CORRECT</span>
+                </button>
             </div>
 
             <!-- SUB-STATE 2C: BUZZER / TIME'S UP POINT AWARD SCREEN -->
             <div id="panel-buzzer" class="hidden bg-slate-900/95 border-2 border-rose-500/80 rounded-3xl p-6 sm:p-8 text-center space-y-5 shadow-2xl">
-                <div class="w-16 h-16 rounded-2xl bg-rose-500/20 border border-rose-500/40 text-rose-400 flex items-center justify-center mx-auto text-3xl animate-bounce">
+                <div class="compact-hide w-16 h-16 rounded-2xl bg-rose-500/20 border border-rose-500/40 text-rose-400 flex items-center justify-center mx-auto text-3xl animate-bounce">
                     <i class="fa-solid fa-bell"></i>
                 </div>
 
@@ -432,11 +558,12 @@
                     </p>
                 </div>
 
-                <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-4 max-w-lg mx-auto space-y-3">
-                    <p class="text-xs sm:text-sm font-semibold text-slate-200">
+                <div class="award-box bg-slate-800/80 border border-slate-700 rounded-2xl p-4 max-w-lg mx-auto space-y-3">
+                    <p class="compact-show hidden text-xs font-semibold text-slate-200">Give +1 to the team <span class="text-emerald-400 underline font-extrabold">NOT</span> holding the phone:</p>
+                    <p class="compact-hide text-xs sm:text-sm font-semibold text-slate-200">
                         Tap the team that was <span class="text-emerald-400 underline font-extrabold">NOT</span> holding the device when the buzzer sounded to award them <strong>+1 Point</strong>:
                     </p>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="award-grid grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <button id="btn-award-team-a" type="button"
                             class="py-3.5 px-4 rounded-xl bg-sky-600 hover:bg-sky-500 active:translate-y-0.5 text-white font-extrabold text-sm sm:text-base shadow-lg flex items-center justify-center gap-2 transition cursor-pointer">
                             <i class="fa-solid fa-plus-circle"></i>
@@ -457,7 +584,7 @@
 
             <!-- SUB-STATE 2D: CHAMPION / VICTORY SCREEN -->
             <div id="panel-victory" class="hidden bg-slate-900/95 border-2 border-amber-400 rounded-3xl p-6 sm:p-8 text-center space-y-5 shadow-2xl">
-                <div class="w-20 h-20 rounded-full bg-amber-500/20 border-2 border-amber-400 text-amber-300 flex items-center justify-center mx-auto text-4xl shadow-lg">
+                <div class="compact-hide w-20 h-20 rounded-full bg-amber-500/20 border-2 border-amber-400 text-amber-300 flex items-center justify-center mx-auto text-4xl shadow-lg">
                     <i class="fa-solid fa-crown"></i>
                 </div>
                 <div class="space-y-1">
@@ -471,7 +598,7 @@
                         Final Score: 7 - 5
                     </p>
                 </div>
-                <div class="flex flex-col sm:flex-row gap-3 justify-center max-w-md mx-auto pt-2">
+                <div class="victory-actions flex flex-col sm:flex-row gap-3 justify-center max-w-md mx-auto pt-2">
                     <button id="btn-play-again" type="button"
                         class="flex-1 btn-gold text-slate-950 font-cinzel font-extrabold py-3.5 px-5 rounded-xl flex items-center justify-center gap-2 cursor-pointer">
                         <i class="fa-solid fa-rotate-right"></i>
@@ -516,7 +643,7 @@
                 </div>
                 <div class="flex gap-3">
                     <span class="w-6 h-6 rounded-full bg-amber-500/20 text-amber-300 font-bold flex items-center justify-center shrink-0">3</span>
-                    <p><strong>Pass It Fast:</strong> As soon as your teammates shout the right answer, tap <strong class="text-emerald-400">GOT IT! (NEXT)</strong> and immediately hand the device to the player on your left (the other team).</p>
+                    <p><strong>Pass It Fast:</strong> As soon as your teammates shout the right answer, tap <strong class="text-emerald-400">CORRECT</strong> and immediately hand the device to the player on your left (the other team).</p>
                 </div>
                 <div class="flex gap-3">
                     <span class="w-6 h-6 rounded-full bg-amber-500/20 text-amber-300 font-bold flex items-center justify-center shrink-0">4</span>
@@ -1121,7 +1248,7 @@
             targetScore: 7,
             baseDuration: 60,
             timerStyle: "suspense", // "suspense" | "visible"
-            showHints: true,
+            showHints: false,
             roundNumber: 1,
             clearedThisRound: 0,
             isRoundActive: false,
@@ -1132,8 +1259,58 @@
             roundEndTime: 0,
             totalRoundMs: 60000,
             rafId: null,
-            lastTickTime: 0
+            lastTickTime: 0,
+            wakeLock: null
         };
+
+        function setText(id, text) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = text;
+        }
+
+        /* Shrink the word until it fits its card (long phrases, small screens) */
+        function fitPhrase() {
+            const box = document.getElementById("phrase-fit-box");
+            const el = document.getElementById("card-phrase-text");
+            if (!box || !el || box.clientHeight === 0) return;
+            const maxPx = Math.min(box.clientHeight * 0.42, box.clientWidth * 0.16, 96);
+            let size = Math.max(maxPx, 18);
+            el.style.fontSize = size + "px";
+            while (size > 16 && (box.scrollHeight > box.clientHeight + 1 || el.scrollWidth > box.clientWidth + 1)) {
+                size -= 2;
+                el.style.fontSize = size + "px";
+            }
+        }
+
+        /* Keep the screen awake during a round (where supported) */
+        async function requestWakeLock() {
+            try {
+                if ("wakeLock" in navigator && !gameState.wakeLock) {
+                    gameState.wakeLock = await navigator.wakeLock.request("screen");
+                    gameState.wakeLock.addEventListener("release", () => { gameState.wakeLock = null; });
+                }
+            } catch (err) { /* not supported or denied */ }
+        }
+        function releaseWakeLock() {
+            try { if (gameState.wakeLock) gameState.wakeLock.release(); } catch (err) {}
+            gameState.wakeLock = null;
+        }
+
+        /* On phones opened in the browser (not installed), go full screen + landscape */
+        function enterPhoneFullscreen() {
+            try {
+                const isStandalone = window.matchMedia("(display-mode: standalone)").matches ||
+                    window.matchMedia("(display-mode: fullscreen)").matches || navigator.standalone;
+                const isTouch = window.matchMedia("(pointer: coarse)").matches;
+                if (isStandalone || !isTouch || document.fullscreenElement) return;
+                const root = document.documentElement;
+                if (root.requestFullscreen) {
+                    root.requestFullscreen({ navigationUI: "hide" })
+                        .then(() => screen.orientation && screen.orientation.lock && screen.orientation.lock("landscape"))
+                        .catch(() => {});
+                }
+            } catch (err) {}
+        }
 
         function loadCustomWords() {
             try {
@@ -1262,6 +1439,8 @@
             gameState.baseDuration = parseInt(document.getElementById("select-timer").value, 10) || 60;
             gameState.targetScore = parseInt(document.getElementById("select-target-score").value, 10) || 7;
             gameState.timerStyle = document.getElementById("select-timer-style").value || "suspense";
+            gameState.showHints = document.getElementById("select-hints").value === "on";
+            enterPhoneFullscreen();
 
             gameState.scoreA = 0;
             gameState.scoreB = 0;
@@ -1295,7 +1474,9 @@
             SoundEngine.init();
             gameState.isRoundActive = true;
             gameState.clearedThisRound = 0;
-            document.getElementById("round-cleared-count").textContent = "0";
+            setText("round-cleared-count", "0");
+            document.body.classList.add("playing");
+            requestWakeLock();
 
             // Slight random variance (+/- 5 sec) in suspense mode for true Catch Phrase feel
             const variance = gameState.timerStyle === "suspense"
@@ -1339,9 +1520,6 @@
             const card = gameState.currentCard;
             if (!card) return;
 
-            const badgeSpan = document.getElementById("card-category-badge").querySelector("span");
-            badgeSpan.textContent = getBadgeForCategory(card.category);
-
             document.getElementById("card-phrase-text").textContent = card.text;
 
             const hintEl = document.getElementById("card-hint-text");
@@ -1351,13 +1529,14 @@
             } else {
                 hintEl.classList.add("hidden");
             }
+            fitPhrase();
         }
 
         function handleGotIt() {
             if (!gameState.isRoundActive) return;
             SoundEngine.playGotIt();
             gameState.clearedThisRound += 1;
-            document.getElementById("round-cleared-count").textContent = String(gameState.clearedThisRound);
+            setText("round-cleared-count", String(gameState.clearedThisRound));
             drawNextCard();
         }
 
@@ -1421,8 +1600,9 @@
                     gameState.lastTickTime = now;
                     SoundEngine.playTick(urgencyLevel);
                     pulseCardVisual(urgencyLevel);
-                    document.getElementById("tempo-status-label").textContent = statusText;
-                    document.getElementById("tick-indicator-dot").className = dotClass;
+                    setText("tempo-status-label", statusText);
+                    const dot = document.getElementById("tick-indicator-dot");
+                    if (dot) dot.className = dotClass;
                 }
 
                 gameState.rafId = requestAnimationFrame(tickFrame);
@@ -1443,6 +1623,8 @@
 
         function stopRoundTimer() {
             gameState.isRoundActive = false;
+            document.body.classList.remove("playing", "buzzing");
+            releaseWakeLock();
             if (gameState.rafId) {
                 cancelAnimationFrame(gameState.rafId);
                 gameState.rafId = null;
@@ -1457,6 +1639,7 @@
             container.classList.add("animate-buzzer");
             setTimeout(() => container.classList.remove("animate-buzzer"), 650);
 
+            document.body.classList.add("buzzing");
             const lastPhrase = gameState.currentCard ? gameState.currentCard.text : "None";
             document.getElementById("buzzer-last-word").textContent = `"${lastPhrase}"`;
 
@@ -1482,6 +1665,7 @@
         }
 
         function showVictoryScreen() {
+            document.body.classList.remove("buzzing");
             SoundEngine.playVictory();
             const winnerName = gameState.scoreA >= gameState.targetScore
                 ? gameState.teamAName
@@ -1601,11 +1785,17 @@
             document.getElementById("btn-got-it").addEventListener("click", handleGotIt);
             document.getElementById("btn-skip-word").addEventListener("click", handleSkipWord);
 
-            // Toggle Hint Visibility
-            document.getElementById("btn-toggle-hint").addEventListener("click", () => {
-                gameState.showHints = !gameState.showHints;
-                document.getElementById("hint-toggle-text").textContent = gameState.showHints ? "Hide Hint" : "Show Hint";
-                renderCurrentCard();
+            // Stop the round early (small x in the card corner)
+            document.getElementById("btn-exit-round").addEventListener("click", () => {
+                if (window.confirm("Stop this round? No point will be given.")) {
+                    showReadySubPanel();
+                }
+            });
+
+            // Re-fit the word when the phone rotates / resizes
+            window.addEventListener("resize", fitPhrase);
+            document.addEventListener("visibilitychange", () => {
+                if (document.visibilityState === "visible" && gameState.isRoundActive) requestWakeLock();
             });
 
             // Buzzer Point Awarding
@@ -1705,6 +1895,13 @@
 
         // Run setup now if the page is already loaded (preview apps / viewers often load
         // the page late, so DOMContentLoaded never fires and the buttons stay dead).
+        // Offline support / installable app
+        if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+            window.addEventListener("load", () => {
+                navigator.serviceWorker.register("sw.js").catch(() => {});
+            });
+        }
+
         if (document.readyState === "loading") {
             document.addEventListener("DOMContentLoaded", initScripturePhraseApp);
         } else {
