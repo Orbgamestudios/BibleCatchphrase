@@ -1,0 +1,1715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Scripture Phrase - Bible & Lutheran Catch Phrase Game</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Fallback so screens and pop-ups still hide if the Tailwind CDN can't load (offline) */
+        .hidden { display: none; }
+
+        :root {
+            --gold-primary: #f59e0b;
+            --gold-light: #fde68a;
+            --parchment-bg: #fffbeb;
+            --parchment-border: #d97706;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at top, #1e293b 0%, #0f172a 65%, #020617 100%);
+            color: #f8fafc;
+            min-height: 100vh;
+            overflow-x: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .font-cinzel {
+            font-family: 'Cinzel', serif;
+        }
+
+        /* Parchment Card Styling */
+        .parchment-card {
+            background: linear-gradient(145deg, #fffdf5 0%, #fef3c7 100%);
+            border: 3px solid #d97706;
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7),
+                        0 0 25px rgba(245, 158, 11, 0.2),
+                        inset 0 0 30px rgba(217, 119, 6, 0.12);
+            transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+        }
+
+        /* Visual Pulse when timer ticks */
+        .card-tick-pulse {
+            transform: scale(1.018);
+            box-shadow: 0 22px 45px -12px rgba(0, 0, 0, 0.75),
+                        0 0 35px rgba(245, 158, 11, 0.5),
+                        inset 0 0 30px rgba(217, 119, 6, 0.18);
+        }
+
+        .card-urgent-pulse {
+            transform: scale(1.028);
+            border-color: #ef4444;
+            box-shadow: 0 22px 45px -12px rgba(239, 68, 68, 0.45),
+                        0 0 40px rgba(239, 68, 68, 0.65),
+                        inset 0 0 30px rgba(239, 68, 68, 0.18);
+        }
+
+        /* Tactile 3D Game Buttons */
+        .btn-got-it {
+            background: linear-gradient(180deg, #10b981 0%, #059669 100%);
+            box-shadow: 0 6px 0 #065f46, 0 12px 20px rgba(16, 185, 129, 0.3);
+            transition: all 0.1s ease;
+        }
+        .btn-got-it:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #065f46, 0 5px 10px rgba(16, 185, 129, 0.25);
+        }
+
+        .btn-skip {
+            background: linear-gradient(180deg, #475569 0%, #334155 100%);
+            box-shadow: 0 6px 0 #1e293b, 0 10px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.1s ease;
+        }
+        .btn-skip:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #1e293b, 0 4px 8px rgba(0, 0, 0, 0.25);
+        }
+
+        .btn-gold {
+            background: linear-gradient(180deg, #fbbf24 0%, #d97706 100%);
+            box-shadow: 0 5px 0 #92400e, 0 10px 20px rgba(245, 158, 11, 0.3);
+            transition: all 0.1s ease;
+        }
+        .btn-gold:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #92400e, 0 4px 10px rgba(245, 158, 11, 0.25);
+        }
+
+        /* Screen Shake on Buzzer */
+        @keyframes buzzerShake {
+            0%, 100% { transform: translateX(0); }
+            15%, 45%, 75% { transform: translateX(-10px) rotate(-1deg); }
+            30%, 60%, 90% { transform: translateX(10px) rotate(1deg); }
+        }
+        .animate-buzzer {
+            animation: buzzerShake 0.55s ease-in-out;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 9999px;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen justify-between p-3 sm:p-5">
+
+    <!-- TOP NAVIGATION BAR -->
+    <header class="w-full max-w-3xl mx-auto flex items-center justify-between gap-2 py-2 px-3 sm:px-4 rounded-2xl bg-slate-900/90 border border-slate-700/80 shadow-lg backdrop-blur-md">
+        <div class="flex items-center gap-2.5">
+            <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-400 shadow-inner">
+                <i class="fa-solid fa-cross text-lg"></i>
+            </div>
+            <div>
+                <h1 class="font-cinzel font-extrabold text-base sm:text-xl tracking-wide text-amber-300 leading-tight">
+                    SCRIPTURE PHRASE
+                </h1>
+                <p class="text-[11px] text-slate-400 hidden sm:block">
+                    Bible &amp; Lutheran Youth Group Catch Phrase
+                </p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-1.5 sm:gap-2">
+            <!-- Sound Toggle -->
+            <button id="btn-sound-toggle" type="button" title="Toggle Sound"
+                class="px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600/80 text-amber-300 text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition">
+                <i id="sound-icon" class="fa-solid fa-volume-high"></i>
+                <span id="sound-label" class="hidden md:inline">Sound On</span>
+            </button>
+
+            <!-- Custom Words Modal Button -->
+            <button id="btn-open-custom" type="button"
+                class="px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600/80 text-slate-200 text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition">
+                <i class="fa-solid fa-plus text-amber-400"></i>
+                <span>+ Words</span>
+            </button>
+
+            <!-- How to Play Button -->
+            <button id="btn-open-rules" type="button"
+                class="px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600/80 text-slate-200 text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition">
+                <i class="fa-solid fa-circle-question text-sky-400"></i>
+                <span class="hidden sm:inline">Rules</span>
+            </button>
+
+            <!-- Home / Setup Button (Shown during active game) -->
+            <button id="btn-return-setup" type="button"
+                class="hidden px-2.5 py-2 rounded-xl bg-rose-950/80 hover:bg-rose-900 border border-rose-700/70 text-rose-200 text-xs sm:text-sm font-semibold items-center gap-1.5 transition">
+                <i class="fa-solid fa-gear"></i>
+                <span class="hidden sm:inline">Setup</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main id="app-container" class="w-full max-w-3xl mx-auto my-auto py-3 flex-1 flex flex-col justify-center">
+
+        <!-- ===================================================================
+             VIEW 1: SETUP & LOBBY SCREEN
+        ==================================================================== -->
+        <section id="screen-setup" class="w-full space-y-4">
+            <div class="bg-slate-900/90 border border-slate-700/80 rounded-3xl p-4 sm:p-6 shadow-2xl backdrop-blur-md space-y-5">
+
+                <!-- Banner Header -->
+                <div class="text-center space-y-1.5 border-b border-slate-800 pb-4">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-500/15 text-amber-300 border border-amber-400/30">
+                        <i class="fa-solid fa-bolt"></i> Hot-Potato Team Party Game
+                    </span>
+                    <h2 class="font-cinzel text-2xl sm:text-3xl font-extrabold text-white">
+                        Pass the Device Before the Buzzer!
+                    </h2>
+                    <p class="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto">
+                        Sit in a circle alternating teams. Give clues so your team guesses the Bible or Lutheran phrase, then tap <strong class="text-emerald-400">GOT IT!</strong> and hand the device to the next player!
+                    </p>
+                </div>
+
+                <!-- Team Names Configuration -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="bg-slate-800/70 border border-sky-500/30 rounded-2xl p-3">
+                        <label for="input-team-a" class="block text-[11px] font-bold uppercase tracking-wider text-sky-400 mb-1">
+                            <i class="fa-solid fa-shield-halved mr-1"></i> Team 1 Name
+                        </label>
+                        <input id="input-team-a" type="text" maxlength="22" value="Team Lions"
+                            class="w-full bg-slate-900/90 border border-slate-700 focus:border-sky-400 rounded-xl px-3 py-2 text-sm font-bold text-white outline-none transition">
+                    </div>
+                    <div class="bg-slate-800/70 border border-amber-500/30 rounded-2xl p-3">
+                        <label for="input-team-b" class="block text-[11px] font-bold uppercase tracking-wider text-amber-400 mb-1">
+                            <i class="fa-solid fa-fire-flame-curved mr-1"></i> Team 2 Name
+                        </label>
+                        <input id="input-team-b" type="text" maxlength="22" value="Team Eagles"
+                            class="w-full bg-slate-900/90 border border-slate-700 focus:border-amber-400 rounded-xl px-3 py-2 text-sm font-bold text-white outline-none transition">
+                    </div>
+                </div>
+
+                <!-- Category Selector -->
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="text-xs font-bold uppercase tracking-wider text-slate-300">
+                            <i class="fa-solid fa-book-bible text-amber-400 mr-1.5"></i> Choose Deck Category
+                        </label>
+                        <span id="available-words-count" class="text-xs font-bold text-amber-300 bg-amber-500/15 px-3 py-0.5 rounded-full border border-amber-500/30">
+                            345 Phrases Ready
+                        </span>
+                    </div>
+                    <div id="category-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        <!-- Populated dynamically via JS -->
+                    </div>
+                </div>
+
+                <!-- Game Settings Row -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                    <!-- Round Duration -->
+                    <div class="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-3">
+                        <label for="select-timer" class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+                            <i class="fa-regular fa-clock text-amber-400 mr-1"></i> Round Timer
+                        </label>
+                        <select id="select-timer" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-2 text-xs sm:text-sm font-semibold text-white outline-none">
+                            <option value="45">Fast (~45 sec)</option>
+                            <option value="60" selected>Standard (~60 sec)</option>
+                            <option value="75">Extended (~75 sec)</option>
+                            <option value="90">Youth Group (~90 sec)</option>
+                        </select>
+                    </div>
+
+                    <!-- Points to Win -->
+                    <div class="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-3">
+                        <label for="select-target-score" class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+                            <i class="fa-solid fa-trophy text-amber-400 mr-1"></i> Points to Win
+                        </label>
+                        <select id="select-target-score" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-2 text-xs sm:text-sm font-semibold text-white outline-none">
+                            <option value="5">First to 5 Points</option>
+                            <option value="7" selected>First to 7 Points</option>
+                            <option value="10">First to 10 Points</option>
+                            <option value="15">Marathon (15 Pts)</option>
+                        </select>
+                    </div>
+
+                    <!-- Timer Visibility -->
+                    <div class="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-3">
+                        <label for="select-timer-style" class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+                            <i class="fa-solid fa-eye-slash text-amber-400 mr-1"></i> Countdown Style
+                        </label>
+                        <select id="select-timer-style" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-2 text-xs sm:text-sm font-semibold text-white outline-none">
+                            <option value="suspense" selected>Catch Phrase (Suspense)</option>
+                            <option value="visible">Show Progress Bar &amp; Secs</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Start Game CTA -->
+                <button id="btn-start-match" type="button"
+                    class="w-full btn-gold text-slate-950 font-cinzel font-extrabold text-lg sm:text-xl py-4 rounded-2xl flex items-center justify-center gap-3 tracking-wide cursor-pointer">
+                    <i class="fa-solid fa-play"></i>
+                    <span>START GAME</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- ===================================================================
+             VIEW 2: ACTIVE GAMEPLAY & SCOREBOARD SCREEN
+        ==================================================================== -->
+        <section id="screen-game" class="hidden w-full space-y-3 sm:space-y-4">
+
+            <!-- SCOREBOARD BAR -->
+            <div class="grid grid-cols-3 items-center gap-2 bg-slate-900/90 border border-slate-700/80 rounded-2xl p-2.5 sm:p-3.5 shadow-lg">
+                <!-- Team A Score Box -->
+                <div class="flex items-center justify-between bg-sky-950/50 border border-sky-500/30 rounded-xl px-3 py-2">
+                    <div class="truncate pr-1">
+                        <div id="score-name-a" class="text-xs sm:text-sm font-extrabold text-sky-300 truncate">Team Lions</div>
+                        <div class="text-[10px] text-sky-400/80 uppercase tracking-wider font-semibold">Team 1</div>
+                    </div>
+                    <span id="score-val-a" class="font-cinzel text-2xl sm:text-3xl font-extrabold text-white">0</span>
+                </div>
+
+                <!-- Center Match Info -->
+                <div class="text-center px-1">
+                    <div class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[11px] font-bold">
+                        <span>Round</span>
+                        <span id="round-number-badge">1</span>
+                    </div>
+                    <div class="text-[11px] text-slate-400 mt-1 font-medium">
+                        Goal: <strong id="goal-score-badge" class="text-slate-200">7</strong> pts
+                    </div>
+                    <div class="text-[11px] text-slate-400 font-medium">
+                        Deck Left: <strong id="deck-left-badge" class="text-amber-300">345</strong>
+                    </div>
+                </div>
+
+                <!-- Team B Score Box -->
+                <div class="flex items-center justify-between bg-amber-950/50 border border-amber-500/30 rounded-xl px-3 py-2">
+                    <span id="score-val-b" class="font-cinzel text-2xl sm:text-3xl font-extrabold text-white">0</span>
+                    <div class="text-right truncate pl-1">
+                        <div id="score-name-b" class="text-xs sm:text-sm font-extrabold text-amber-300 truncate">Team Eagles</div>
+                        <div class="text-[10px] text-amber-400/80 uppercase tracking-wider font-semibold">Team 2</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SUB-STATE 2A: PRE-ROUND READY OVERLAY -->
+            <div id="panel-ready" class="bg-slate-900/90 border border-slate-700/80 rounded-3xl p-6 sm:p-8 text-center space-y-5 shadow-2xl">
+                <div class="w-16 h-16 rounded-2xl bg-amber-500/20 border border-amber-400/40 text-amber-300 flex items-center justify-center mx-auto text-3xl shadow-inner">
+                    <i class="fa-solid fa-hands-holding-circle"></i>
+                </div>
+                <div class="space-y-2">
+                    <span id="ready-category-pill" class="text-xs font-bold uppercase tracking-widest text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-400/20">
+                        All Scripture &amp; Church
+                    </span>
+                    <h3 class="font-cinzel text-2xl sm:text-3xl font-extrabold text-white">
+                        Ready for Round <span id="ready-round-num">1</span>?
+                    </h3>
+                    <p class="text-xs sm:text-sm text-slate-300 max-w-md mx-auto">
+                        Hand the device to the starting clue-giver. As soon as your team guesses the phrase, tap <strong class="text-emerald-400">GOT IT!</strong> and immediately pass the device to the other team!
+                    </p>
+                </div>
+                <button id="btn-begin-timer" type="button"
+                    class="w-full max-w-md mx-auto btn-gold text-slate-950 font-cinzel font-extrabold text-lg sm:text-xl py-4 px-6 rounded-2xl flex items-center justify-center gap-3 cursor-pointer">
+                    <i class="fa-solid fa-stopwatch"></i>
+                    <span>START TIMER &amp; DRAW CARD</span>
+                </button>
+            </div>
+
+            <!-- SUB-STATE 2B: ACTIVE HOT-POTATO CARD AREA -->
+            <div id="panel-active-play" class="hidden space-y-3 sm:space-y-4">
+
+                <!-- Timer Tempo & Controls Strip -->
+                <div class="flex items-center justify-between px-2 py-1.5 rounded-xl bg-slate-900/80 border border-slate-800">
+                    <div class="flex items-center gap-2">
+                        <span id="tick-indicator-dot" class="w-3 h-3 rounded-full bg-emerald-400 inline-block shadow-sm"></span>
+                        <span id="tempo-status-label" class="text-xs font-bold uppercase tracking-wider text-slate-300">
+                            Timer Ticking...
+                        </span>
+                        <span id="visible-seconds-badge" class="hidden text-xs font-extrabold text-amber-300 bg-slate-800 px-2 py-0.5 rounded-md border border-slate-700">
+                            60s
+                        </span>
+                    </div>
+
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs font-semibold text-slate-400">
+                            Cleared: <strong id="round-cleared-count" class="text-emerald-400">0</strong>
+                        </span>
+                        <button id="btn-toggle-hint" type="button"
+                            class="text-xs font-bold px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 transition flex items-center gap-1">
+                            <i class="fa-regular fa-lightbulb"></i>
+                            <span id="hint-toggle-text">Hide Hint</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Optional Visible Countdown Progress Bar -->
+                <div id="timer-progress-container" class="hidden w-full h-2.5 bg-slate-800 rounded-full overflow-hidden border border-slate-700">
+                    <div id="timer-progress-bar" class="h-full bg-gradient-to-r from-emerald-400 via-amber-400 to-rose-500 transition-all duration-200" style="width: 100%;"></div>
+                </div>
+
+                <!-- THE PARCHMENT PHRASE CARD (Clean UI - No clutter/forbidden word tags) -->
+                <div id="phrase-card" class="parchment-card rounded-3xl p-6 sm:p-10 text-center min-h-[230px] sm:min-h-[270px] flex flex-col items-center justify-between relative overflow-hidden">
+                    <!-- Top Category Badge -->
+                    <div class="w-full flex items-center justify-center">
+                        <span id="card-category-badge" class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider bg-amber-900/15 text-amber-900 border border-amber-700/30">
+                            <i class="fa-solid fa-scroll"></i>
+                            <span>Old Testament</span>
+                        </span>
+                    </div>
+
+                    <!-- Center Target Phrase -->
+                    <div class="my-auto py-4 px-2 w-full">
+                        <h2 id="card-phrase-text" class="font-cinzel font-extrabold text-3xl sm:text-5xl text-slate-900 tracking-tight leading-tight break-words">
+                            Burning Bush
+                        </h2>
+
+                        <!-- Optional Helpful Context Hint -->
+                        <p id="card-hint-text" class="mt-3 text-sm sm:text-base font-medium text-amber-950/80 bg-amber-500/15 border border-amber-600/20 rounded-xl px-3.5 py-2 max-w-lg mx-auto">
+                            A plant on fire that didn't burn up when God spoke to Moses
+                        </p>
+                    </div>
+
+                    <!-- Subtle Pass Reminder -->
+                    <div class="text-[11px] font-bold uppercase tracking-widest text-amber-900/60">
+                        Describe it to your team &bull; Pass after they guess!
+                    </div>
+                </div>
+
+                <!-- BIG ACTION BUTTONS (SKIP & GOT IT) -->
+                <div class="grid grid-cols-5 gap-3 sm:gap-4 pt-1">
+                    <button id="btn-skip-word" type="button"
+                        class="col-span-2 btn-skip text-white font-extrabold py-4 sm:py-5 px-4 rounded-2xl flex flex-col items-center justify-center gap-1 cursor-pointer">
+                        <div class="flex items-center gap-2 text-base sm:text-lg">
+                            <i class="fa-solid fa-forward"></i>
+                            <span>SKIP</span>
+                        </div>
+                        <span class="text-[10px] text-slate-300 font-medium uppercase tracking-wider">New Card (S / &rarr;)</span>
+                    </button>
+
+                    <button id="btn-got-it" type="button"
+                        class="col-span-3 btn-got-it text-white font-extrabold py-4 sm:py-5 px-4 rounded-2xl flex flex-col items-center justify-center gap-1 cursor-pointer">
+                        <div class="flex items-center gap-2 text-lg sm:text-2xl tracking-wide">
+                            <i class="fa-solid fa-check-double"></i>
+                            <span>GOT IT! (NEXT)</span>
+                        </div>
+                        <span class="text-[10px] text-emerald-100 font-semibold uppercase tracking-wider">Pass Device! (Space / Enter)</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- SUB-STATE 2C: BUZZER / TIME'S UP POINT AWARD SCREEN -->
+            <div id="panel-buzzer" class="hidden bg-slate-900/95 border-2 border-rose-500/80 rounded-3xl p-6 sm:p-8 text-center space-y-5 shadow-2xl">
+                <div class="w-16 h-16 rounded-2xl bg-rose-500/20 border border-rose-500/40 text-rose-400 flex items-center justify-center mx-auto text-3xl animate-bounce">
+                    <i class="fa-solid fa-bell"></i>
+                </div>
+
+                <div class="space-y-1.5">
+                    <span class="text-xs font-extrabold uppercase tracking-widest text-rose-400">
+                        BZZZZT! TIME RAN OUT!
+                    </span>
+                    <h3 class="font-cinzel text-2xl sm:text-3xl font-extrabold text-white">
+                        Who Gets the Point?
+                    </h3>
+                    <p class="text-xs sm:text-sm text-slate-300 max-w-md mx-auto">
+                        Last phrase on screen: <strong id="buzzer-last-word" class="text-amber-300">"Burning Bush"</strong>
+                    </p>
+                </div>
+
+                <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-4 max-w-lg mx-auto space-y-3">
+                    <p class="text-xs sm:text-sm font-semibold text-slate-200">
+                        Tap the team that was <span class="text-emerald-400 underline font-extrabold">NOT</span> holding the device when the buzzer sounded to award them <strong>+1 Point</strong>:
+                    </p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <button id="btn-award-team-a" type="button"
+                            class="py-3.5 px-4 rounded-xl bg-sky-600 hover:bg-sky-500 active:translate-y-0.5 text-white font-extrabold text-sm sm:text-base shadow-lg flex items-center justify-center gap-2 transition cursor-pointer">
+                            <i class="fa-solid fa-plus-circle"></i>
+                            <span id="award-label-a">+1 Pt Team Lions</span>
+                        </button>
+                        <button id="btn-award-team-b" type="button"
+                            class="py-3.5 px-4 rounded-xl bg-amber-600 hover:bg-amber-500 active:translate-y-0.5 text-white font-extrabold text-sm sm:text-base shadow-lg flex items-center justify-center gap-2 transition cursor-pointer">
+                            <i class="fa-solid fa-plus-circle"></i>
+                            <span id="award-label-b">+1 Pt Team Eagles</span>
+                        </button>
+                    </div>
+                    <button id="btn-replay-no-point" type="button"
+                        class="text-xs text-slate-400 hover:text-slate-200 underline pt-1 inline-block">
+                        No point (tie / mid-pass) &mdash; Replay Round
+                    </button>
+                </div>
+            </div>
+
+            <!-- SUB-STATE 2D: CHAMPION / VICTORY SCREEN -->
+            <div id="panel-victory" class="hidden bg-slate-900/95 border-2 border-amber-400 rounded-3xl p-6 sm:p-8 text-center space-y-5 shadow-2xl">
+                <div class="w-20 h-20 rounded-full bg-amber-500/20 border-2 border-amber-400 text-amber-300 flex items-center justify-center mx-auto text-4xl shadow-lg">
+                    <i class="fa-solid fa-crown"></i>
+                </div>
+                <div class="space-y-1">
+                    <span class="text-xs font-extrabold uppercase tracking-widest text-amber-400">
+                        Scripture Phrase Champions!
+                    </span>
+                    <h3 id="victory-team-title" class="font-cinzel text-3xl sm:text-4xl font-extrabold text-white">
+                        Team Lions Wins!
+                    </h3>
+                    <p id="victory-final-score" class="text-sm sm:text-base text-slate-300 font-semibold">
+                        Final Score: 7 - 5
+                    </p>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-3 justify-center max-w-md mx-auto pt-2">
+                    <button id="btn-play-again" type="button"
+                        class="flex-1 btn-gold text-slate-950 font-cinzel font-extrabold py-3.5 px-5 rounded-xl flex items-center justify-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-rotate-right"></i>
+                        <span>Play Again (Keep Deck)</span>
+                    </button>
+                    <button id="btn-victory-setup" type="button"
+                        class="py-3.5 px-5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-200 font-bold text-sm transition cursor-pointer">
+                        Change Settings
+                    </button>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="w-full max-w-3xl mx-auto text-center py-2 text-[11px] text-slate-500">
+        <span>340+ High-School Friendly Bible &amp; Lutheran Phrases &bull; Keyboard: <kbd class="px-1.5 py-0.5 bg-slate-800 rounded text-slate-300">Space</kbd> Got It, <kbd class="px-1.5 py-0.5 bg-slate-800 rounded text-slate-300">S</kbd> Skip</span>
+    </footer>
+
+    <!-- ===================================================================
+         MODAL 1: HOW TO PLAY RULES
+    ==================================================================== -->
+    <div id="modal-rules" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/75 p-4 backdrop-blur-sm">
+        <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-lg w-full p-5 sm:p-6 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="font-cinzel text-lg sm:text-xl font-bold text-amber-300 flex items-center gap-2">
+                    <i class="fa-solid fa-book-open"></i> How to Play Scripture Phrase
+                </h3>
+                <button id="btn-close-rules" type="button" class="w-8 h-8 rounded-lg bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="space-y-3 text-xs sm:text-sm text-slate-300 leading-relaxed">
+                <div class="flex gap-3">
+                    <span class="w-6 h-6 rounded-full bg-amber-500/20 text-amber-300 font-bold flex items-center justify-center shrink-0">1</span>
+                    <p><strong>Sit in a Circle:</strong> Divide your youth group or class into 2 teams. Sit in a circle alternating teams (Team 1, Team 2, Team 1, Team 2).</p>
+                </div>
+                <div class="flex gap-3">
+                    <span class="w-6 h-6 rounded-full bg-amber-500/20 text-amber-300 font-bold flex items-center justify-center shrink-0">2</span>
+                    <p><strong>Give Clues:</strong> The player holding the device describes the Bible or Lutheran phrase on screen using any helpful clues, actions, or context (just don't say the exact words printed on the card!).</p>
+                </div>
+                <div class="flex gap-3">
+                    <span class="w-6 h-6 rounded-full bg-amber-500/20 text-amber-300 font-bold flex items-center justify-center shrink-0">3</span>
+                    <p><strong>Pass It Fast:</strong> As soon as your teammates shout the right answer, tap <strong class="text-emerald-400">GOT IT! (NEXT)</strong> and immediately hand the device to the player on your left (the other team).</p>
+                </div>
+                <div class="flex gap-3">
+                    <span class="w-6 h-6 rounded-full bg-amber-500/20 text-amber-300 font-bold flex items-center justify-center shrink-0">4</span>
+                    <p><strong>Beat the Buzzer:</strong> The timer ticks faster and faster! Whichever team is stuck holding the device when the buzzer goes off loses the round, and the <strong>other team scores 1 point</strong>.</p>
+                </div>
+            </div>
+            <button id="btn-got-rules" type="button" class="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm transition">
+                Got It, Let's Play!
+            </button>
+        </div>
+    </div>
+
+    <!-- ===================================================================
+         MODAL 2: ADD CUSTOM WORDS
+    ==================================================================== -->
+    <div id="modal-custom" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/75 p-4 backdrop-blur-sm">
+        <div class="bg-slate-900 border border-slate-700 rounded-3xl max-w-lg w-full p-5 sm:p-6 space-y-4 shadow-2xl max-h-[90vh] flex flex-col">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="font-cinzel text-lg sm:text-xl font-bold text-amber-300 flex items-center gap-2">
+                    <i class="fa-solid fa-feather-pointed"></i> Custom Youth Group Words
+                </h3>
+                <button id="btn-close-custom" type="button" class="w-8 h-8 rounded-lg bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <p class="text-xs text-slate-400">
+                Add inside jokes, your church's pastor/youth leader names, camp themes, or Sunday sermon topics! They automatically mix into "All Categories" and "Custom Only".
+            </p>
+
+            <div class="space-y-2.5">
+                <input id="input-custom-phrase" type="text" maxlength="55" placeholder="Phrase (e.g., Pastor Mike's Coffee Mug)"
+                    class="w-full bg-slate-800 border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-sm text-white outline-none">
+                <div class="flex gap-2">
+                    <input id="input-custom-hint" type="text" maxlength="90" placeholder="Optional hint (e.g., Never seen without it on Sunday)"
+                        class="flex-1 bg-slate-800 border border-slate-700 focus:border-amber-400 rounded-xl px-3.5 py-2 text-xs text-white outline-none">
+                    <button id="btn-add-custom-word" type="button"
+                        class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm shrink-0 transition">
+                        + Add
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto space-y-1.5 pr-1 max-h-48 border-t border-slate-800 pt-3" id="custom-words-list">
+                <!-- Populated by JS -->
+            </div>
+
+            <div class="flex justify-between items-center pt-2 border-t border-slate-800">
+                <button id="btn-clear-custom" type="button" class="text-xs text-rose-400 hover:underline">
+                    Clear All Custom Words
+                </button>
+                <button id="btn-done-custom" type="button" class="px-5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs">
+                    Done
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================
+         APPLICATION JAVASCRIPT
+    ==================================================================== -->
+    <script>
+        /* ============================================================================
+           1. CATEGORIES & 345+ HIGH-SCHOOL ACCESSIBLE BIBLE & LUTHERAN PHRASES
+           All strings use double quotes so apostrophes never cause syntax issues.
+        ============================================================================ */
+        const BIBLE_CATEGORIES = [
+            { id: "all", name: "All Categories", icon: "fa-globe", badge: "All Scripture & Church" },
+            { id: "ot_events", name: "Old Testament Stories", icon: "fa-water", badge: "Old Testament" },
+            { id: "nt_miracles", name: "Miracles & Parables", icon: "fa-dove", badge: "Miracles & Parables" },
+            { id: "characters", name: "Bible Characters", icon: "fa-users", badge: "Bible Character" },
+            { id: "objects_places", name: "Objects, Symbols & Places", icon: "fa-compass", badge: "Sacred Object / Place" },
+            { id: "verses_concepts", name: "Famous Sayings & Verses", icon: "fa-heart", badge: "Verse & Concept" },
+            { id: "lutheran_service", name: "Lutheran & Church Service", icon: "fa-church", badge: "Lutheran & Worship" },
+            { id: "custom", name: "Custom Only", icon: "fa-feather-pointed", badge: "Custom Phrase" }
+        ];
+
+        const INITIAL_WORD_BANK = [
+            // =========================================================================
+            // 1. OLD TESTAMENT STORIES (61 High-School Friendly Entries)
+            // =========================================================================
+            { text: "Exodus", category: "ot_events", hint: "The Israelites escaping slavery in Egypt led by Moses" },
+            { text: "Burning Bush", category: "ot_events", hint: "A plant on fire that didn't burn up when God spoke to Moses" },
+            { text: "Bronze Serpent", category: "ot_events", hint: "Metal snake Moses lifted on a pole in the desert so people who looked at it were healed" },
+            { text: "Creation of the World", category: "ot_events", hint: "In the beginning when God made the heavens and the earth" },
+            { text: "Seven Days of Creation", category: "ot_events", hint: "God made light, sky, land, sun & stars, animals, and humans, then rested on the 7th day" },
+            { text: "Adam Naming the Animals", category: "ot_events", hint: "Job God gave the first man in the Garden of Eden" },
+            { text: "Making Eve from Adam's Rib", category: "ot_events", hint: "How God created the first woman while Adam was in a deep sleep" },
+            { text: "Eating the Forbidden Fruit", category: "ot_events", hint: "When Adam and Eve listened to the serpent in the Garden of Eden" },
+            { text: "Cain and Abel", category: "ot_events", hint: "Adam and Eve's first two sons; one was a shepherd and one was a farmer" },
+            { text: "Building Noah's Ark", category: "ot_events", hint: "Constructing a massive wooden boat before the worldwide flood" },
+            { text: "Two of Every Animal", category: "ot_events", hint: "How the creatures boarded Noah's Ark male and female" },
+            { text: "Forty Days and Forty Nights of Rain", category: "ot_events", hint: "How long the rainstorm fell during the Great Flood" },
+            { text: "Rainbow in the Clouds", category: "ot_events", hint: "Colorful sign of God's promise to Noah never to flood the whole earth again" },
+            { text: "Tower of Babel", category: "ot_events", hint: "People tried to build a tower to heaven and God scrambled their languages" },
+            { text: "Abraham Counting the Stars", category: "ot_events", hint: "God promised Abraham his family would be as numerous as the night sky" },
+            { text: "Abraham and Isaac on the Mountain", category: "ot_events", hint: "Abraham trusted God, and God provided a ram caught in the bushes instead" },
+            { text: "Lot's Wife Turning to Salt", category: "ot_events", hint: "She looked back at the burning city of Sodom and became a pillar of salt" },
+            { text: "Esau Selling His Birthright for Stew", category: "ot_events", hint: "Twin brother who traded his family inheritance to Jacob for a bowl of red soup" },
+            { text: "Jacob's Ladder", category: "ot_events", hint: "Jacob slept on a stone pillow and dreamed of a stairway to heaven with angels" },
+            { text: "Jacob Wrestling with an Angel", category: "ot_events", hint: "All-night match where Jacob's hip was touched and his name was changed to Israel" },
+            { text: "Joseph Sold into Slavery", category: "ot_events", hint: "His jealous older brothers threw him in a dry well and sold him to merchants" },
+            { text: "Joseph in Prison", category: "ot_events", hint: "Unfairly jailed in Egypt, where he interpreted the cupbearer's and baker's dreams" },
+            { text: "Pharaoh's Dream of Seven Fat Cows", category: "ot_events", hint: "Dream Joseph interpreted about 7 years of plenty followed by 7 years of famine" },
+            { text: "Joseph Forgiving His Brothers", category: "ot_events", hint: "Second-in-command of Egypt reveals his identity and hugs the brothers who sold him" },
+            { text: "Baby Moses in a Basket", category: "ot_events", hint: "Floated on the Nile River among the reeds and found by Pharaoh's daughter" },
+            { text: "Let My People Go", category: "ot_events", hint: "Famous demand Moses and Aaron spoke to Pharaoh in Egypt" },
+            { text: "Moses' Staff Turning into a Snake", category: "ot_events", hint: "Miracle sign when Moses threw his wooden shepherd rod on the ground" },
+            { text: "Ten Plagues of Egypt", category: "ot_events", hint: "Ten disasters sent on Egypt so Pharaoh would free the Israelites" },
+            { text: "Nile River Turning into Blood", category: "ot_events", hint: "The very first plague in Egypt where all the river water turned red" },
+            { text: "Plague of Frogs", category: "ot_events", hint: "Millions of amphibians jumping into Egyptian houses, ovens, and beds" },
+            { text: "Plague of Locusts", category: "ot_events", hint: "Swarms of grasshoppers eating every green plant left in Egypt" },
+            { text: "Darkness for Three Days", category: "ot_events", hint: "Plague where pitch-black night covered Egypt so no one could see" },
+            { text: "The First Passover", category: "ot_events", hint: "Lamb's blood painted on doorframes in Egypt so the final plague passed over" },
+            { text: "Parting the Red Sea", category: "ot_events", hint: "Moses raised his staff and God split the sea so Israel walked across on dry ground" },
+            { text: "Water from the Rock", category: "ot_events", hint: "Moses struck a boulder in the desert and fresh drinking water gushed out" },
+            { text: "The Golden Calf", category: "ot_events", hint: "Fake idol statue the Israelites melted their gold earrings to make while Moses was on the mountain" },
+            { text: "Moses Breaking the Stone Tablets", category: "ot_events", hint: "When Moses came down Mount Sinai, saw the Golden Calf, and smashed the Ten Commandments" },
+            { text: "Wandering 40 Years in the Desert", category: "ot_events", hint: "How long Israel camped in the wilderness before entering the Promised Land" },
+            { text: "Twelve Spies in Canaan", category: "ot_events", hint: "Sent to scout the Promised Land; only Joshua and Caleb trusted God against the giants" },
+            { text: "The Talking Donkey", category: "ot_events", hint: "An animal saw an angel with a sword blocking the road and spoke out loud to its rider" },
+            { text: "Crossing the Jordan River", category: "ot_events", hint: "Priests stepped into the water carrying the Ark and the river stopped flowing" },
+            { text: "Walls of Jericho", category: "ot_events", hint: "City walls that collapsed after Israel marched around them for 7 days and blew trumpets" },
+            { text: "The Sun Standing Still", category: "ot_events", hint: "Joshua prayed during battle and God made daylight last extra hours" },
+            { text: "Gideon's 300 Soldiers", category: "ot_events", hint: "Tiny army that surrounded a huge camp at night with trumpets, torches, and clay jars" },
+            { text: "Gideon's Wool Fleece", category: "ot_events", hint: "Piece of sheep's wool left on the ground overnight to check for morning dew as a sign from God" },
+            { text: "Samson Fighting a Lion", category: "ot_events", hint: "Strongest man in the Bible who defeated a roaring lion with his bare hands" },
+            { text: "Samson and Delilah", category: "ot_events", hint: "Strong man tricked into revealing that his uncut hair was the secret of his strength" },
+            { text: "Samson Pushing Down the Pillars", category: "ot_events", hint: "Blind Samson prayed for strength one last time and collapsed the Philistine temple columns" },
+            { text: "Ruth Gathering Grain in the Field", category: "ot_events", hint: "Loyal woman who gleaned barley in Boaz's field to feed her mother-in-law Naomi" },
+            { text: "Young Samuel Hearing God's Voice", category: "ot_events", hint: "Boy sleeping in the temple who woke up three times thinking the priest Eli called him" },
+            { text: "David Playing the Harp for King Saul", category: "ot_events", hint: "Shepherd boy playing soothing music when the king was troubled" },
+            { text: "David and Goliath", category: "ot_events", hint: "A teenager with a sling and a stone defeats a nine-foot armored giant" },
+            { text: "Solomon's Wise Judgment", category: "ot_events", hint: "King Solomon figured out who the real mother of a baby was" },
+            { text: "Queen of Sheba Visiting Solomon", category: "ot_events", hint: "Royal visitor who traveled far with camels and gold to test Solomon's wisdom" },
+            { text: "Elijah Fed by Ravens", category: "ot_events", hint: "Black birds brought the prophet bread and meat every morning and evening by a brook" },
+            { text: "Elijah and the Prophets of Baal", category: "ot_events", hint: "Contest on Mount Carmel where God sent fire from heaven onto a water-soaked altar" },
+            { text: "Still Small Voice", category: "ot_events", hint: "After a mighty wind, earthquake, and fire, God spoke to Elijah in a gentle whisper" },
+            { text: "Chariot of Fire", category: "ot_events", hint: "Fiery horses and chariot that carried Elijah up to heaven in a whirlwind" },
+            { text: "Three Men in the Fiery Furnace", category: "ot_events", hint: "Thrown into a blazing oven for refusing to bow to a gold statue, and didn't even smell like smoke" },
+            { text: "Writing on the Wall", category: "ot_events", hint: "Mysterious floating hand wrote a message on the palace wall during a king's party" },
+            { text: "Daniel in the Lion's Den", category: "ot_events", hint: "Thrown into a pit of hungry lions for praying to God, and angels shut the lions' mouths" },
+            { text: "Jonah and the Whale", category: "ot_events", hint: "Prophet who ran away on a ship, got thrown overboard, and spent 3 days inside a giant fish" },
+
+            // =========================================================================
+            // 2. MIRACLES & PARABLES (48 High-School Friendly Entries)
+            // =========================================================================
+            { text: "The Parable of the Talents", category: "nt_miracles", hint: "Servants given bags of silver/gold to invest while their master traveled" },
+            { text: "Jesus Healing the Blind Man", category: "nt_miracles", hint: "Jesus restored sight to a man who couldn't see since birth" },
+            { text: "Turning Water into Wine", category: "nt_miracles", hint: "Jesus' very first miracle at a wedding feast in Cana when the drinks ran out" },
+            { text: "Feeding the 5,000", category: "nt_miracles", hint: "Jesus multiplied a boy's lunch to feed a massive crowd on a grassy hillside" },
+            { text: "Five Loaves and Two Fish", category: "nt_miracles", hint: "The small lunch a boy shared that Jesus blessed to feed thousands with 12 baskets left over" },
+            { text: "Jesus Walking on Water", category: "nt_miracles", hint: "Jesus strolling across the stormy waves of the lake at 3 AM" },
+            { text: "Peter Sinking in the Waves", category: "nt_miracles", hint: "Disciple who stepped out of the boat onto the water until he looked at the wind and got scared" },
+            { text: "Jesus Calming the Storm", category: "nt_miracles", hint: "Jesus woke up from a nap in the boat, said 'Peace, be still!' and the storm stopped" },
+            { text: "Miraculous Catch of Fish", category: "nt_miracles", hint: "After catching nothing all night, the fishermen filled their nets until the boats nearly sank" },
+            { text: "Raising Lazarus from the Dead", category: "nt_miracles", hint: "After 4 days in the tomb, Jesus shouted 'Lazarus, come out!' and His friend walked out alive" },
+            { text: "Man Lowered Through the Roof", category: "nt_miracles", hint: "Four friends dug a hole in the ceiling tiles to lower a paralyzed man on a mat to Jesus" },
+            { text: "Healing the Ten Lepers", category: "nt_miracles", hint: "Jesus cured ten men of a skin disease, and only one came back to say thank you" },
+            { text: "Healing the Man with a Withered Hand", category: "nt_miracles", hint: "Miracle Jesus performed inside the synagogue on the Sabbath while leaders watched" },
+            { text: "Casting Demons into a Herd of Pigs", category: "nt_miracles", hint: "Evil spirits left a man and sent 2,000 pigs charging down a steep bank into the lake" },
+            { text: "Coin in the Fish's Mouth", category: "nt_miracles", hint: "Jesus told Peter to go fishing and the first fish caught had money inside to pay the tax" },
+            { text: "Withering the Fig Tree", category: "nt_miracles", hint: "Leafy tree with no fruit that dried up after Jesus spoke to it" },
+            { text: "Raising the Little Girl from the Dead", category: "nt_miracles", hint: "Jesus took Jairus's 12-year-old daughter by the hand and said 'Little girl, get up!'" },
+            { text: "Touching the Edge of Jesus' Cloak", category: "nt_miracles", hint: "Sick woman in a crowd who reached out and was instantly healed by faith" },
+            { text: "Healing the Soldier's Cut-Off Ear", category: "nt_miracles", hint: "When Peter swung a sword in the garden, Jesus touched the servant's ear and healed it" },
+            { text: "Jesus Appearing Behind Locked Doors", category: "nt_miracles", hint: "On Easter evening, the risen Jesus suddenly stood in the locked room saying 'Peace be with you'" },
+            { text: "Peter's Prison Chains Falling Off", category: "nt_miracles", hint: "An angel woke Peter in jail, his chains dropped off, and the iron city gate opened by itself" },
+            { text: "Paul and Silas Earthquake in Prison", category: "nt_miracles", hint: "They sang hymns at midnight in jail and an earthquake shook all the cell doors open" },
+            { text: "Paul Bitten by a Poisonous Snake", category: "nt_miracles", hint: "Shipwrecked on an island, a viper bit Paul's hand by the campfire and he shook it off unharmed" },
+            { text: "The Good Samaritan", category: "nt_miracles", hint: "Parable about a kind traveler who bandaged an injured stranger on the road and paid for his inn" },
+            { text: "The Prodigal Son", category: "nt_miracles", hint: "A runaway son wasted his money, ended up feeding pigs, and came home to a forgiving father" },
+            { text: "Parable of the Lost Sheep", category: "nt_miracles", hint: "A shepherd leaves 99 sheep behind to search the hills for the 1 that wandered away" },
+            { text: "Parable of the Lost Coin", category: "nt_miracles", hint: "A woman lights a lamp and sweeps her whole house until she finds 1 missing silver coin" },
+            { text: "Parable of the Sower and the Seeds", category: "nt_miracles", hint: "Farmer scattering seeds on the path, rocky ground, thorny bushes, and good soil" },
+            { text: "Wise and Foolish Builders", category: "nt_miracles", hint: "One built his house on solid rock and the other built his house on shifting sand" },
+            { text: "House Built on the Solid Rock", category: "nt_miracles", hint: "The rain fell, the floods came, and the winds blew, yet this house did not fall" },
+            { text: "House Built on the Sand", category: "nt_miracles", hint: "When the storm hit, this foolish builder's house collapsed with a great crash" },
+            { text: "Parable of the Mustard Seed", category: "nt_miracles", hint: "The tiniest seed in the garden that grows into a big tree where birds build nests" },
+            { text: "Pearl of Great Price", category: "nt_miracles", hint: "Merchant who sold everything he owned to buy one priceless jewel" },
+            { text: "Treasure Hidden in a Field", category: "nt_miracles", hint: "Man who found buried treasure, covered it up, and joyfully sold everything to buy that field" },
+            { text: "Parable of the Unforgiving Servant", category: "nt_miracles", hint: "King forgave a man millions of dollars, but that man choked a coworker who owed him a few bucks" },
+            { text: "Ten Wise and Foolish Bridesmaids", category: "nt_miracles", hint: "Five brought extra flasks of oil for their lamps while waiting for the groom, and five ran out" },
+            { text: "Workers in the Vineyard", category: "nt_miracles", hint: "Landowner who paid the workers hired at 5 PM the exact same generous wage as the morning crew" },
+            { text: "Parable of the Rich Fool", category: "nt_miracles", hint: "Greedy guy who tore down his barns to build bigger ones, forgetting his life could end tonight" },
+            { text: "The Sheep and the Goats", category: "nt_miracles", hint: "Jesus' teaching about separating those who fed the hungry and clothed the needy from those who didn't" },
+            { text: "Pharisee and the Tax Collector Praying", category: "nt_miracles", hint: "One bragged about how good he was; the other humbly looked down asking God for mercy" },
+            { text: "The Widow's Two Coins", category: "nt_miracles", hint: "Poor woman who dropped two tiny copper coins into the offering box, giving all she had" },
+            { text: "Speck in Your Brother's Eye", category: "nt_miracles", hint: "Trying to fix someone's tiny flaw while ignoring a giant wooden plank sticking out of your own eye" },
+            { text: "New Wine in Old Wineskins", category: "nt_miracles", hint: "Pouring fresh fermenting wine into stiff old leather bags makes them burst" },
+            { text: "Lamp Under a Basket", category: "nt_miracles", hint: "You don't light a candle and hide it under a bowl; you put it on a stand to light the room" },
+            { text: "The Great Banquet Invitation", category: "nt_miracles", hint: "Host invited VIP guests who made lame excuses, so he invited the poor and outsiders to the feast" },
+            { text: "Weeds Among the Wheat", category: "nt_miracles", hint: "An enemy secretly planted fake weeds in a farmer's wheat field while everyone slept" },
+            { text: "The True Vine and the Branches", category: "nt_miracles", hint: "Jesus said 'I am the vine, you are the branches; stay connected to Me to bear much fruit'" },
+            { text: "Blind Man Healed with Mud on His Eyes", category: "nt_miracles", hint: "Jesus mixed spit and dirt to make clay, put it on a blind man's eyes, and told him to wash" },
+
+            // =========================================================================
+            // 3. BIBLE CHARACTERS (57 Recognizable High-School Friendly Names)
+            // =========================================================================
+            { text: "Jesus Christ", category: "characters", hint: "Son of God, Savior of the world, born in Bethlehem" },
+            { text: "The Holy Spirit", category: "characters", hint: "Third person of the Trinity who came like wind and fire at Pentecost" },
+            { text: "Adam and Eve", category: "characters", hint: "The very first man and woman God created in the Garden of Eden" },
+            { text: "Noah", category: "characters", hint: "Built the giant ark and saved his family and the animals from the flood" },
+            { text: "Abraham", category: "characters", hint: "Father of faith whom God promised descendants as numerous as the stars" },
+            { text: "Sarah", category: "characters", hint: "Abraham's wife who laughed with joy when she gave birth to Isaac at age 90" },
+            { text: "Isaac", category: "characters", hint: "Miracle son born to Abraham and Sarah in their old age" },
+            { text: "Jacob", category: "characters", hint: "Twin brother of Esau and father of the 12 tribes of Israel" },
+            { text: "Joseph", category: "characters", hint: "Wore a coat of many colors, sold into Egypt, and rose from prison to become governor" },
+            { text: "Pharaoh", category: "characters", hint: "Stubborn ruler of Egypt who refused to let the Israelites go until the 10 plagues" },
+            { text: "Moses", category: "characters", hint: "Carried a shepherd's staff, parted the Red Sea, and received the Ten Commandments" },
+            { text: "Aaron", category: "characters", hint: "Moses' older brother who served as spokesperson and Israel's first High Priest" },
+            { text: "Miriam", category: "characters", hint: "Moses' older sister who watched his basket on the Nile and led worship with a tambourine" },
+            { text: "Joshua", category: "characters", hint: "Took over leadership after Moses and led Israel around the walls of Jericho" },
+            { text: "Gideon", category: "characters", hint: "Put out a wool fleece to test God's sign and led a small army of 300 men" },
+            { text: "Samson", category: "characters", hint: "Strongest man in the Bible who fought a lion and pushed down temple pillars" },
+            { text: "Delilah", category: "characters", hint: "Woman who tricked Samson into revealing the secret of his uncut hair" },
+            { text: "Ruth", category: "characters", hint: "Loyal woman who stayed with her mother-in-law Naomi and gathered grain in Boaz's field" },
+            { text: "Samuel", category: "characters", hint: "Prophet who heard God calling him as a boy and anointed both Saul and David as kings" },
+            { text: "King Saul", category: "characters", hint: "Tallest man in Israel who became the nation's very first king, then grew jealous of David" },
+            { text: "King David", category: "characters", hint: "Defeated Goliath as a shepherd boy, wrote many Psalms, and became Israel's greatest king" },
+            { text: "Goliath", category: "characters", hint: "Nine-foot-tall armored Philistine giant defeated by a single stone from David's sling" },
+            { text: "Jonathan", category: "characters", hint: "King Saul's brave son and David's loyal best friend who gave David his armor and bow" },
+            { text: "King Solomon", category: "characters", hint: "David's son, known as the wisest and richest king who built the first Temple in Jerusalem" },
+            { text: "Elijah", category: "characters", hint: "Bold prophet fed by ravens who rode up to heaven in a chariot of fire" },
+            { text: "Queen Esther", category: "characters", hint: "Brave Jewish orphan who became queen of Persia and saved her people ('For such a time as this')" },
+            { text: "Job", category: "characters", hint: "Patient man who lost his wealth and health in a huge test of faith, yet still trusted God" },
+            { text: "Isaiah", category: "characters", hint: "Major prophet who saw God's throne room and foretold Jesus' birth ('Unto us a child is born')" },
+            { text: "Jeremiah", category: "characters", hint: "Prophet who wrote 'For I know the plans I have for you, plans to give you hope and a future'" },
+            { text: "Daniel", category: "characters", hint: "Prayed three times a day by his window, interpreted royal dreams, and survived the Lion's Den" },
+            { text: "Jonah", category: "characters", hint: "Reluctant prophet swallowed by a giant fish when he tried to sail away from Nineveh" },
+            { text: "Angel Gabriel", category: "characters", hint: "Messenger angel sent by God to tell Mary she would give birth to Jesus" },
+            { text: "Michael the Archangel", category: "characters", hint: "Warrior angel who leads heaven's armies against the dragon in Revelation" },
+            { text: "Mary and Joseph", category: "characters", hint: "The mother and earthly father of Jesus who traveled to Bethlehem" },
+            { text: "Baby Jesus", category: "characters", hint: "Newborn Savior wrapped in cloths and lying in a manger in Bethlehem" },
+            { text: "The Three Wise Men", category: "characters", hint: "Royal travelers from the East who followed a star to bring gold, frankincense, and myrrh" },
+            { text: "Shepherds in Bethlehem", category: "characters", hint: "Watched their flocks at night when a choir of angels appeared announcing Jesus' birth" },
+            { text: "King Herod", category: "characters", hint: "Cruel, jealous ruler in Jerusalem when the Wise Men came looking for the newborn King" },
+            { text: "John the Baptist", category: "characters", hint: "Jesus' cousin who wore camel hair, ate locusts and wild honey, and baptized in the Jordan" },
+            { text: "Simon Peter", category: "characters", hint: "Outspoken fisherman disciple who walked on water, denied Jesus three times, and preached at Pentecost" },
+            { text: "Andrew", category: "characters", hint: "Simon Peter's brother who immediately ran to tell Peter 'We have found the Messiah!'" },
+            { text: "James and John (Sons of Thunder)", category: "characters", hint: "Two fisherman brothers nicknamed by Jesus for their fiery personalities" },
+            { text: "Matthew the Tax Collector", category: "characters", hint: "Left his money booth when Jesus said 'Follow Me' and wrote the first Gospel" },
+            { text: "Doubting Thomas", category: "characters", hint: "Disciple who refused to believe Jesus rose until he saw the nail marks in His hands" },
+            { text: "Judas Iscariot", category: "characters", hint: "Disciple who betrayed Jesus with a kiss in the garden for 30 pieces of silver" },
+            { text: "Mary Magdalene", category: "characters", hint: "Loyal follower of Jesus who was the very first person to see Him alive on Easter morning" },
+            { text: "Mary and Martha", category: "characters", hint: "Two sisters who hosted Jesus; one stressed in the kitchen while the other sat listening at His feet" },
+            { text: "Lazarus", category: "characters", hint: "Brother of Mary and Martha whom Jesus brought back to life after 4 days in a tomb" },
+            { text: "Pontius Pilate", category: "characters", hint: "Roman governor who washed his hands in a bowl of water at Jesus' trial" },
+            { text: "Barabbas", category: "characters", hint: "Criminal prisoner the crowd shouted for Pilate to release instead of Jesus" },
+            { text: "The Thief on the Cross", category: "characters", hint: "Crucified next to Jesus, he asked 'Remember me' and Jesus promised 'Today you will be with Me in paradise'" },
+            { text: "Roman Centurion", category: "characters", hint: "Army officer of 100 soldiers who said at the cross, 'Surely this man was the Son of God!'" },
+            { text: "Stephen", category: "characters", hint: "First Christian martyr whose face shone like an angel and who forgave those throwing stones at him" },
+            { text: "Apostle Paul", category: "characters", hint: "Used to be Saul, saw a bright light on the road to Damascus, and wrote half the New Testament" },
+            { text: "Barnabas", category: "characters", hint: "Paul's missionary travel partner whose name means 'Son of Encouragement'" },
+            { text: "Timothy", category: "characters", hint: "Young pastor mentored by Paul ('Don't let anyone look down on you because you are young')" },
+            { text: "Luke the Doctor", category: "characters", hint: "Physician and historian who traveled with Paul and wrote the Gospel of Luke and Acts" },
+
+            // =========================================================================
+            // 4. OBJECTS, SYMBOLS & PLACES (56 High-School Friendly Entries)
+            // =========================================================================
+            { text: "Garden of Eden", category: "objects_places", hint: "Perfect paradise where Adam and Eve lived before the Fall" },
+            { text: "Forbidden Fruit", category: "objects_places", hint: "Fruit from the Tree of Knowledge of Good and Evil that Adam and Eve ate" },
+            { text: "Noah's Ark", category: "objects_places", hint: "Three-story wooden ship built to survive the Great Flood" },
+            { text: "Dove with an Olive Branch", category: "objects_places", hint: "White bird that brought Noah a fresh green leaf showing dry land had appeared" },
+            { text: "Joseph's Coat of Many Colors", category: "objects_places", hint: "Special colorful robe Jacob gave his favorite son Joseph" },
+            { text: "Mount Sinai", category: "objects_places", hint: "Cloud-covered mountain where God gave Moses the Ten Commandments" },
+            { text: "The Ten Commandments", category: "objects_places", hint: "God's laws ('Do not steal', 'Honor your father and mother') carved on two stone tablets" },
+            { text: "Ark of the Covenant", category: "objects_places", hint: "Sacred gold-covered chest with two golden angels on top that held the stone tablets" },
+            { text: "The Tabernacle", category: "objects_places", hint: "Portable worship tent the Israelites carried through the desert" },
+            { text: "Pillar of Cloud and Fire", category: "objects_places", hint: "How God visibly guided Israel through the wilderness by day and by night" },
+            { text: "Manna from Heaven", category: "objects_places", hint: "Sweet wafer-like bread that appeared like dew on the desert ground every morning" },
+            { text: "The Promised Land", category: "objects_places", hint: "Land 'flowing with milk and honey' that God promised to Abraham's descendants" },
+            { text: "Sling and Five Smooth Stones", category: "objects_places", hint: "What young David picked up from a stream to defeat Goliath" },
+            { text: "Goliath's Giant Sword", category: "objects_places", hint: "Massive weapon David took from the defeated Philistine champion" },
+            { text: "David's Harp", category: "objects_places", hint: "Stringed musical instrument David played while writing Psalms as a shepherd" },
+            { text: "Solomon's Temple", category: "objects_places", hint: "Magnificent gold-lined house of God built in Jerusalem" },
+            { text: "Ram's Horn Trumpet", category: "objects_places", hint: "Curved horn blown by priests when marching around the walls of Jericho" },
+            { text: "Ashes and Sackcloth", category: "objects_places", hint: "Scratchy burlap clothes and dust people wore in Bible times to show they were sorry" },
+            { text: "Bethlehem", category: "objects_places", hint: "Small town of David where Jesus was born in a stable" },
+            { text: "Baby in a Manger", category: "objects_places", hint: "Animal feeding trough filled with hay where Mary laid newborn Jesus" },
+            { text: "Star of Bethlehem", category: "objects_places", hint: "Supernatural bright star in the night sky that guided the Wise Men" },
+            { text: "Gold, Frankincense, and Myrrh", category: "objects_places", hint: "The three royal gifts presented to baby Jesus by the Wise Men" },
+            { text: "Nazareth", category: "objects_places", hint: "Hometown village where Jesus grew up in Joseph's carpenter shop" },
+            { text: "Jordan River", category: "objects_places", hint: "River where Joshua crossed into the Promised Land and John baptized Jesus" },
+            { text: "Sea of Galilee", category: "objects_places", hint: "Freshwater lake where Jesus called the fishermen, calmed the storm, and walked on water" },
+            { text: "Jerusalem", category: "objects_places", hint: "Holy capital city where the Temple stood and where Jesus rode in on Palm Sunday" },
+            { text: "Palm Branches", category: "objects_places", hint: "Green leaves crowds waved and laid on the road on Palm Sunday shouting 'Hosanna!'" },
+            { text: "Palm Sunday Donkey", category: "objects_places", hint: "Humble animal Jesus rode into Jerusalem while crowds cheered" },
+            { text: "Flipping Tables in the Temple", category: "objects_places", hint: "When Jesus drove out greedy merchants who turned God's house into a 'den of thieves'" },
+            { text: "The Upper Room", category: "objects_places", hint: "Upstairs dining room where Jesus shared the Last Supper and the disciples prayed at Pentecost" },
+            { text: "The Last Supper", category: "objects_places", hint: "Final meal Jesus shared with His 12 disciples the night before Good Friday" },
+            { text: "Washing the Disciples' Feet", category: "objects_places", hint: "Jesus knelt with a water basin and towel at the Last Supper to teach humble service" },
+            { text: "Bread and Cup", category: "objects_places", hint: "Shared by Jesus at the Last Supper to represent His body and blood" },
+            { text: "Garden of Gethsemane", category: "objects_places", hint: "Grove of olive trees where Jesus prayed the night He was arrested" },
+            { text: "Thirty Pieces of Silver", category: "objects_places", hint: "Bag of coins paid to Judas Iscariot to betray Jesus" },
+            { text: "Rooster Crowing Three Times", category: "objects_places", hint: "Morning bird sound that reminded Peter he had just denied knowing Jesus three times" },
+            { text: "Crown of Thorns", category: "objects_places", hint: "Woven circle of sharp thorns Roman soldiers pressed onto Jesus' head" },
+            { text: "The Cross at Calvary", category: "objects_places", hint: "Wooden beam on the hill of Golgotha where Jesus died for our sins" },
+            { text: "Temple Curtain Torn in Two", category: "objects_places", hint: "Giant thick veil in the Temple that ripped from top to bottom the moment Jesus died" },
+            { text: "Heavy Stone Rolled Away", category: "objects_places", hint: "Giant round boulder moved from the entrance of Jesus' tomb by an angel on Easter morning" },
+            { text: "The Empty Tomb", category: "objects_places", hint: "Cave grave found open with folded linen cloths on Easter Sunday morning" },
+            { text: "Jesus Ascending into Heaven", category: "objects_places", hint: "40 days after Easter, Jesus blessed His disciples and rose up into the clouds" },
+            { text: "Day of Pentecost", category: "objects_places", hint: "Birthday of the Church when the Holy Spirit arrived with rushing wind and flames of fire" },
+            { text: "Road to Damascus", category: "objects_places", hint: "Highway where Saul was blinded by a light from heaven and heard Jesus' voice" },
+            { text: "Armor of God", category: "objects_places", hint: "Spiritual gear in Ephesians 6: Belt of Truth, Breastplate, Shield, Helmet, and Sword" },
+            { text: "Shield of Faith", category: "objects_places", hint: "Piece of the Armor of God used to extinguish all the flaming arrows of the evil one" },
+            { text: "Sword of the Spirit", category: "objects_places", hint: "The only offensive weapon in the Armor of God, which is the Word of God (the Bible)" },
+            { text: "Helmet of Salvation", category: "objects_places", hint: "Piece of the Armor of God worn on the head to protect your mind and hope" },
+            { text: "Streets of Gold", category: "objects_places", hint: "Pure, transparent golden roads in the heavenly city of New Jerusalem" },
+            { text: "Pearly Gates", category: "objects_places", hint: "Twelve gates of Heaven in Revelation, each made from a single giant pearl" },
+            { text: "The Book of Life", category: "objects_places", hint: "Heavenly scroll containing the names of everyone who belongs to God" },
+            { text: "Seven Golden Lampstands", category: "objects_places", hint: "Glowing candlesticks in Revelation that represent the seven churches" },
+            { text: "Four Horsemen of the Apocalypse", category: "objects_places", hint: "Riders on white, red, black, and pale horses in the Book of Revelation" },
+            { text: "Shepherd's Staff", category: "objects_places", hint: "Curved wooden rod used by Moses and David to guide and rescue sheep" },
+            { text: "The Twelve Disciples", category: "objects_places", hint: "The close group of 12 followers Jesus chose to travel with Him" },
+            { text: "Christian Fish Symbol (Ichthys)", category: "objects_places", hint: "Simple two-line fish drawing early Christians used as a secret sign of their faith" },
+
+            // =========================================================================
+            // 5. FAMOUS SAYINGS, VERSES & CONCEPTS (56 High-School Friendly Entries)
+            // =========================================================================
+            { text: "John 3:16", category: "verses_concepts", hint: "'For God so loved the world that He gave His one and only Son...'" },
+            { text: "Psalm 23", category: "verses_concepts", hint: "'The Lord is my shepherd, I shall not want... Even though I walk through the valley...'" },
+            { text: "The Lord's Prayer", category: "verses_concepts", hint: "'Our Father in heaven, hallowed be Your name, Your kingdom come...'" },
+            { text: "Sermon on the Mount", category: "verses_concepts", hint: "Jesus' most famous outdoor sermon starting with the Beatitudes ('Blessed are...')" },
+            { text: "The Beatitudes", category: "verses_concepts", hint: "'Blessed are the peacemakers, blessed are the meek, blessed are the pure in heart...'" },
+            { text: "Fruit of the Spirit", category: "verses_concepts", hint: "Love, joy, peace, patience, kindness, goodness, faithfulness, gentleness, self-control" },
+            { text: "The Golden Rule", category: "verses_concepts", hint: "'Do to others whatever you would like them to do to you'" },
+            { text: "Love Your Neighbor as Yourself", category: "verses_concepts", hint: "What Jesus called the second greatest commandment right after loving God" },
+            { text: "Love Your Enemies", category: "verses_concepts", hint: "Jesus' radical teaching to pray for those who mistreat or persecute you" },
+            { text: "Turn the Other Cheek", category: "verses_concepts", hint: "Jesus' saying about not getting revenge when someone insults or slaps you" },
+            { text: "Go the Extra Mile", category: "verses_concepts", hint: "If someone forces you to walk one mile carrying their pack, gladly walk two!" },
+            { text: "Salt of the Earth", category: "verses_concepts", hint: "Jesus told His followers they bring flavor and preserve goodness in the world" },
+            { text: "Light of the World", category: "verses_concepts", hint: "Title Jesus used for Himself and for Christians shining good deeds in the dark" },
+            { text: "City on a Hill", category: "verses_concepts", hint: "A glowing town high up on a mountain that cannot be hidden" },
+            { text: "Camel Through the Eye of a Needle", category: "verses_concepts", hint: "Jesus' famous exaggeration about how hard it is for someone trusting riches to enter heaven" },
+            { text: "Faith Can Move Mountains", category: "verses_concepts", hint: "Jesus said even tiny mustard-seed faith can tell a mountain to jump into the sea" },
+            { text: "Ask, Seek, Knock", category: "verses_concepts", hint: "Jesus' promise about prayer: 'Ask and it will be given to you, seek and you will find'" },
+            { text: "Wolf in Sheep's Clothing", category: "verses_concepts", hint: "Warning about fake teachers who look harmless and fluffy on the outside but are dangerous inside" },
+            { text: "Blind Leading the Blind", category: "verses_concepts", hint: "Jesus said if one sightless guide leads another, both will fall into a ditch!" },
+            { text: "Forgive Seventy Times Seven", category: "verses_concepts", hint: "When Peter asked if forgiving 7 times was enough, Jesus multiplied it to mean 'never stop forgiving'" },
+            { text: "Am I My Brother's Keeper?", category: "verses_concepts", hint: "Famous excuse Cain gave when God asked where his brother Abel was" },
+            { text: "Let There Be Light", category: "verses_concepts", hint: "The very first command God spoke in Genesis 1 to banish the darkness" },
+            { text: "Alpha and Omega", category: "verses_concepts", hint: "First and last letters of the Greek alphabet — 'The Beginning and the End'" },
+            { text: "The Good Shepherd", category: "verses_concepts", hint: "Title for Jesus, who knows His sheep by name and lays down His life for them" },
+            { text: "Lamb of God", category: "verses_concepts", hint: "What John the Baptist called Jesus: 'Look, the ___ who takes away the sin of the world!'" },
+            { text: "Prince of Peace", category: "verses_concepts", hint: "Christmas prophecy title for Jesus in Isaiah 9 ('Wonderful Counselor, Mighty God...')" },
+            { text: "Bread of Life", category: "verses_concepts", hint: "Jesus' 'I Am' statement after feeding the 5,000: whoever comes to Him will never go hungry" },
+            { text: "The Way, the Truth, and the Life", category: "verses_concepts", hint: "Famous verse in John 14:6 explaining how we come to God the Father" },
+            { text: "Fishers of Men", category: "verses_concepts", hint: "What Jesus promised to make Simon Peter and Andrew if they left their fishing nets" },
+            { text: "The Great Commission", category: "verses_concepts", hint: "Jesus' final command: 'Go and make disciples of all nations, baptizing them...'" },
+            { text: "Love Is Patient, Love Is Kind", category: "verses_concepts", hint: "Famous wedding passage in 1 Corinthians 13 describing true Christian love" },
+            { text: "I Can Do All Things Through Christ", category: "verses_concepts", hint: "Philippians 4:13 — famous verse written on athletes' shoes about strength in Jesus" },
+            { text: "Fearfully and Wonderfully Made", category: "verses_concepts", hint: "Psalm 139 verse celebrating how carefully God designed and knit you together" },
+            { text: "Be Still and Know That I Am God", category: "verses_concepts", hint: "Psalm 46:10 reminder to stop stressing and trust God's control" },
+            { text: "Trust in the Lord with All Your Heart", category: "verses_concepts", hint: "Proverbs 3:5 — 'and lean not on your own understanding'" },
+            { text: "Pride Goes Before a Fall", category: "verses_concepts", hint: "Famous proverb warning what happens when someone gets too arrogant" },
+            { text: "Iron Sharpens Iron", category: "verses_concepts", hint: "Proverbs 27:17 saying about how good friends challenge and make each other better" },
+            { text: "A Time for Everything", category: "verses_concepts", hint: "Ecclesiastes 3 — 'A time to be born and a time to die, a time to weep and a time to laugh'" },
+            { text: "Love of Money Is the Root of All Kinds of Evil", category: "verses_concepts", hint: "1 Timothy 6:10 warning that greed leads people away from faith" },
+            { text: "Reap What You Sow", category: "verses_concepts", hint: "Farming metaphor meaning you harvest whatever seeds (choices) you plant" },
+            { text: "Body of Christ", category: "verses_concepts", hint: "Metaphor for the Church where every believer is a needed part like hands, eyes, or feet" },
+            { text: "Born Again", category: "verses_concepts", hint: "Phrase Jesus used to explain starting a brand-new spiritual life through water and the Spirit" },
+            { text: "Fasting and Prayer", category: "verses_concepts", hint: "Giving up food or distractions for a time to focus completely on seeking God" },
+            { text: "Sabbath Day of Rest", category: "verses_concepts", hint: "Taking one day every week to stop working, rest, and worship God" },
+            { text: "Tithing (Giving 10 Percent)", category: "verses_concepts", hint: "Giving the first 10% of what you earn back to God's work" },
+            { text: "Amazing Grace", category: "verses_concepts", hint: "Receiving God's free, undeserved kindness and forgiveness as a gift ('once was lost, but now am found')" },
+            { text: "Hallelujah!", category: "verses_concepts", hint: "Hebrew shout of joy in the Psalms that literally means 'Praise the Lord!'" },
+            { text: "Hosanna!", category: "verses_concepts", hint: "Shout of praise crowds yelled while waving palm branches as Jesus rode into Jerusalem" },
+            { text: "The Four Gospels", category: "verses_concepts", hint: "Matthew, Mark, Luke, and John — the four books that tell the life of Jesus" },
+            { text: "Book of Genesis", category: "verses_concepts", hint: "The very first book of the Bible, meaning 'Beginnings'" },
+            { text: "Book of Psalms", category: "verses_concepts", hint: "Longest book right in the middle of the Bible, filled with 150 songs and prayers" },
+            { text: "Book of Proverbs", category: "verses_concepts", hint: "Old Testament book packed with short, practical sayings of wisdom" },
+            { text: "Book of Acts", category: "verses_concepts", hint: "Action-packed New Testament book showing how the early apostles started the Church" },
+            { text: "Book of Revelation", category: "verses_concepts", hint: "The very last book of the Bible showing Jesus' final victory and the new heaven and earth" },
+            { text: "The Holy Trinity", category: "verses_concepts", hint: "One God in three persons: Father, Son, and Holy Spirit" },
+            { text: "In the World, Not of the World", category: "verses_concepts", hint: "Living among everyday people while following God's kingdom values instead" },
+
+            // =========================================================================
+            // 6. LUTHERAN & CHURCH SERVICE (68 High-School Friendly Entries)
+            // =========================================================================
+            { text: "Martin Luther", category: "lutheran_service", hint: "German monk and reformer who nailed the 95 Theses to the church door in 1517" },
+            { text: "The Apostles' Creed", category: "lutheran_service", hint: "'I believe in God, the Father Almighty, Creator of heaven and earth...' spoken together in church" },
+            { text: "A Hymnal", category: "lutheran_service", hint: "Hardcover songbook in the church pew rack filled with numbered hymns and liturgy" },
+            { text: "Communion", category: "lutheran_service", hint: "The Lord's Supper where we receive the bread and wine/juice for the forgiveness of sins" },
+            { text: "The Altar", category: "lutheran_service", hint: "Sacred table at the front center of the sanctuary holding candles, the cross, and Communion" },
+            { text: "Baptism", category: "lutheran_service", hint: "Sacrament at the font using water and God's Word ('In the name of the Father, Son, and Holy Spirit')" },
+            { text: "95 Theses Nailed to the Church Door", category: "lutheran_service", hint: "What Martin Luther hammered onto the Wittenberg Castle Church door on October 31, 1517" },
+            { text: "Luther's Small Catechism", category: "lutheran_service", hint: "Little handbook studied in Confirmation class that explains the 10 Commandments, Creed, and Lord's Prayer" },
+            { text: "\"What Does This Mean?\"", category: "lutheran_service", hint: "The famous four-word question Martin Luther asks after every section in the Small Catechism" },
+            { text: "Confirmation Class", category: "lutheran_service", hint: "Middle school / high school classes studying the Catechism and Bible before affirming your faith" },
+            { text: "Confirmation Robe and Stole", category: "lutheran_service", hint: "White gown and red or white sash confirmands wear at the front of church on Confirmation Sunday" },
+            { text: "Confirmation Verse", category: "lutheran_service", hint: "Special personal Bible verse you pick and memorize to be read aloud when you get confirmed" },
+            { text: "Acolyte (Lighting the Candles)", category: "lutheran_service", hint: "Student helper who walks up the aisle before service with a brass lighter to light the altar candles" },
+            { text: "Candle Lighter and Snuffer", category: "lutheran_service", hint: "Long brass pole with a wick on one side and a bell cone on the other to light and put out candles" },
+            { text: "Passing the Offering Plate", category: "lutheran_service", hint: "Handing the collection basket or brass plate down the pew row during the offertory music" },
+            { text: "Sharing the Peace", category: "lutheran_service", hint: "Shaking hands, fist-bumping, or waving across the pews saying 'Peace be with you!'" },
+            { text: "\"The Lord Be With You\" / \"And Also With You\"", category: "lutheran_service", hint: "Classic call-and-response greeting between the Pastor and the congregation" },
+            { text: "\"Thanks Be to God!\"", category: "lutheran_service", hint: "What the whole congregation says out loud right after the scripture reader finishes a Bible reading" },
+            { text: "Church Pews", category: "lutheran_service", hint: "Long wooden benches in rows where the congregation sits during worship" },
+            { text: "Kneeler Cushion", category: "lutheran_service", hint: "Padded bench that folds down at the pews or altar rail for kneeling in prayer" },
+            { text: "Pew Hymnal Rack", category: "lutheran_service", hint: "Wooden holder on the back of the bench in front of you that holds songbooks, Bibles, and little pencils" },
+            { text: "The Pulpit", category: "lutheran_service", hint: "Elevated stand at the front of the sanctuary where the Pastor preaches the sermon" },
+            { text: "The Lectern", category: "lutheran_service", hint: "Reading stand holding the big Bible where a volunteer reads the Sunday lessons" },
+            { text: "Baptismal Font", category: "lutheran_service", hint: "Bowl or basin on a pedestal at the front of the church that holds the water for Baptisms" },
+            { text: "Pastor's Robe and Stole", category: "lutheran_service", hint: "White robe (alb) and colored cloth scarf worn over the Pastor's shoulders matching the church season" },
+            { text: "The Nicene Creed", category: "lutheran_service", hint: "Longer creed spoken on festival Sundays ('We believe in one God... Light from Light, true God from true God')" },
+            { text: "\"Forgive Us Our Trespasses\"", category: "lutheran_service", hint: "Line in the Lord's Prayer where Lutherans immediately notice if someone says 'debts' instead!" },
+            { text: "The Doxology", category: "lutheran_service", hint: "Short sung hymn as the offering is brought forward: 'Praise God, from whom all blessings flow...'" },
+            { text: "Pipe Organ Music", category: "lutheran_service", hint: "Giant keyboard instrument with foot pedals and shiny metal pipes that fills the sanctuary with sound" },
+            { text: "Church Choir Robes", category: "lutheran_service", hint: "Matching gowns worn by the group of singers who lead hymns and sing an anthem" },
+            { text: "Handbell Choir", category: "lutheran_service", hint: "Musicians wearing white gloves ringing pitched bronze bells lined up on foam-padded tables" },
+            { text: "Church Bulletin", category: "lutheran_service", hint: "Folded paper program handed to you at the door that lists the order of service and announcements" },
+            { text: "Ushers Handing Out Bulletins", category: "lutheran_service", hint: "Friendly volunteers at the sanctuary doors who greet you, hand out programs, and bring up the offering" },
+            { text: "The Sermon", category: "lutheran_service", hint: "The Pastor's 15-minute message explaining the day's Bible readings for our lives" },
+            { text: "Children's Message", category: "lutheran_service", hint: "Part of the service when all the little kids run up to sit on the front steps with the Pastor" },
+            { text: "Communion Wafer and Little Cup", category: "lutheran_service", hint: "Thin unleavened bread wafer and tiny cup of wine or grape juice received at the Lord's Supper" },
+            { text: "The Altar Rail", category: "lutheran_service", hint: "Low wooden or brass railing up front where people kneel or stand in a semi-circle for Communion" },
+            { text: "Advent Wreath", category: "lutheran_service", hint: "Evergreen circle with four candles (blue or purple and one pink) lit one by one the 4 weeks before Christmas" },
+            { text: "Christmas Eve Candlelight Service", category: "lutheran_service", hint: "Everyone tips their little white candle to pass the flame while singing 'Silent Night' in a dark sanctuary" },
+            { text: "Ash Wednesday", category: "lutheran_service", hint: "First day of Lent when the Pastor marks a dark cross of ashes on your forehead" },
+            { text: "Ashes on the Forehead", category: "lutheran_service", hint: "Cross mark made from burned palm branches with the words 'Remember that you are dust'" },
+            { text: "Maundy Thursday", category: "lutheran_service", hint: "Thursday of Holy Week remembering the Last Supper and stripping the altar bare at the end" },
+            { text: "Good Friday Tenebrae Service", category: "lutheran_service", hint: "Solemn service remembering Jesus' crucifixion where candles are extinguished one by one until dark" },
+            { text: "Easter Sunrise Service", category: "lutheran_service", hint: "Early morning celebration with lilies and brass music celebrating the empty tomb" },
+            { text: "\"He Is Risen! He Is Risen Indeed!\"", category: "lutheran_service", hint: "Joyful Easter Sunday greeting shouted back and forth between the Pastor and congregation" },
+            { text: "Reformation Sunday (Wearing Red)", category: "lutheran_service", hint: "Late October Sunday celebrating Martin Luther's rediscovery of the Gospel when everyone wears red" },
+            { text: "Grace Alone, Faith Alone, Scripture Alone", category: "lutheran_service", hint: "The three famous 'Solas' of the Lutheran Reformation explaining how we are saved" },
+            { text: "Luther's Seal (The Luther Rose)", category: "lutheran_service", hint: "Symbol designed by Martin Luther with a black cross inside a red heart on a white rose in a gold ring" },
+            { text: "\"A Mighty Fortress Is Our God\"", category: "lutheran_service", hint: "The most famous hymn written by Martin Luther, based on Psalm 46" },
+            { text: "\"Silent Night\"", category: "lutheran_service", hint: "Beloved Christmas carol sung while holding glowing candles on Christmas Eve" },
+            { text: "Fellowship Hall", category: "lutheran_service", hint: "Gathering room in the church where everyone hangs out after service for coffee, donuts, and potlucks" },
+            { text: "Coffee and Donuts After Service", category: "lutheran_service", hint: "Favorite Sunday morning snack table between worship service and Sunday School" },
+            { text: "Church Potluck / Hotdish", category: "lutheran_service", hint: "Classic Lutheran meal where every family brings a casserole, Jell-O salad, or crockpot to share" },
+            { text: "Youth Group Lock-In", category: "lutheran_service", hint: "Staying awake all night inside the church playing games in the dark and eating pizza at 2 AM" },
+            { text: "National Youth Gathering / Mission Trip", category: "lutheran_service", hint: "Summer road trip piling into church vans to serve another city or worship in a giant stadium" },
+            { text: "Vacation Bible School (VBS)", category: "lutheran_service", hint: "Summer week where high schoolers volunteer to lead little kids in skits, crafts, snacks, and action songs" },
+            { text: "Campfire Worship at Bible Camp", category: "lutheran_service", hint: "Singing praise songs with an acoustic guitar around a fire pit under the stars at summer camp" },
+            { text: "Sunday School", category: "lutheran_service", hint: "Bible classes for kids and high schoolers held before or after the main worship service" },
+            { text: "Stained Glass Windows", category: "lutheran_service", hint: "Colorful glass artwork along the sanctuary walls showing Bible stories when the sunlight shines through" },
+            { text: "Church Bell Tower / Steeple", category: "lutheran_service", hint: "Tall pointed roof tower topped with a cross that rings out on Sunday morning" },
+            { text: "The Benediction (Final Blessing)", category: "lutheran_service", hint: "'The Lord bless you and keep you; the Lord make His face shine on you...' at the very end of service" },
+            { text: "\"Go in Peace, Serve the Lord!\"", category: "lutheran_service", hint: "Final dismissal spoken at the end of worship right before we respond 'Thanks be to God!'" },
+            { text: "Making the Sign of the Cross", category: "lutheran_service", hint: "Touching forehead, chest, and shoulders to remember your Baptism" },
+            { text: "The Sanctuary", category: "lutheran_service", hint: "Main worship room of the church where the pews, altar, pulpit, and organ are located" },
+            { text: "The Narthex (Church Lobby)", category: "lutheran_service", hint: "Official Lutheran church word for the entrance lobby right outside the sanctuary doors" },
+            { text: "Liturgical Colors (Green, Purple, White, Red)", category: "lutheran_service", hint: "Cloth colors on the altar and Pastor's stole that change for Advent, Lent, Easter, and Pentecost" },
+            { text: "Standing for the Gospel Reading", category: "lutheran_service", hint: "When the whole congregation stands up and sings 'Alleluia' before hearing the words of Jesus" },
+            { text: "Confession and Forgiveness", category: "lutheran_service", hint: "Opening part of service where we admit our sins to God and the Pastor announces we are forgiven" }
+        ];
+
+        /* ============================================================================
+           2. DEFENSIVE AUDIO ENGINE (Web Audio API with try/catch safety)
+        ============================================================================ */
+        const SoundEngine = {
+            ctx: null,
+            enabled: true,
+
+            init() {
+                try {
+                    if (!this.ctx) {
+                        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                        if (AudioCtx) {
+                            this.ctx = new AudioCtx();
+                        }
+                    }
+                    if (this.ctx && this.ctx.state === "suspended") {
+                        this.ctx.resume();
+                    }
+                } catch (err) {
+                    // Silently ignore if browser blocks audio
+                }
+            },
+
+            playTick(urgencyLevel) {
+                if (!this.enabled) return;
+                try {
+                    this.init();
+                    if (!this.ctx) return;
+
+                    const now = this.ctx.currentTime;
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+
+                    // Pitch rises slightly as timer gets more urgent (levels 0..3)
+                    const freqs = [520, 620, 740, 880];
+                    osc.type = urgencyLevel >= 2 ? "triangle" : "sine";
+                    osc.frequency.setValueAtTime(freqs[urgencyLevel] || 520, now);
+
+                    gain.gain.setValueAtTime(0.14, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.055);
+
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+
+                    osc.start(now);
+                    osc.stop(now + 0.06);
+                } catch (err) {}
+            },
+
+            playGotIt() {
+                if (!this.enabled) return;
+                try {
+                    this.init();
+                    if (!this.ctx) return;
+
+                    const now = this.ctx.currentTime;
+                    const notes = [587.33, 880]; // D5 -> A5 bright chime
+                    notes.forEach((freq, idx) => {
+                        const osc = this.ctx.createOscillator();
+                        const gain = this.ctx.createGain();
+                        osc.type = "triangle";
+                        osc.frequency.setValueAtTime(freq, now + idx * 0.065);
+                        gain.gain.setValueAtTime(0.2, now + idx * 0.065);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.065 + 0.16);
+                        osc.connect(gain);
+                        gain.connect(this.ctx.destination);
+                        osc.start(now + idx * 0.065);
+                        osc.stop(now + idx * 0.065 + 0.17);
+                    });
+                } catch (err) {}
+            },
+
+            playSkip() {
+                if (!this.enabled) return;
+                try {
+                    this.init();
+                    if (!this.ctx) return;
+
+                    const now = this.ctx.currentTime;
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = "sine";
+                    osc.frequency.setValueAtTime(360, now);
+                    osc.frequency.exponentialRampToValueAtTime(240, now + 0.09);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.095);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.1);
+                } catch (err) {}
+            },
+
+            playBuzzer() {
+                if (!this.enabled) return;
+                try {
+                    this.init();
+                    if (!this.ctx) return;
+
+                    const now = this.ctx.currentTime;
+                    // Dual-tone game show horn buzzer
+                    [145, 195].forEach((freq) => {
+                        const osc = this.ctx.createOscillator();
+                        const gain = this.ctx.createGain();
+                        osc.type = "sawtooth";
+                        osc.frequency.setValueAtTime(freq, now);
+                        gain.gain.setValueAtTime(0.24, now);
+                        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.85);
+                        osc.connect(gain);
+                        gain.connect(this.ctx.destination);
+                        osc.start(now);
+                        osc.stop(now + 0.88);
+                    });
+                } catch (err) {}
+            },
+
+            playVictory() {
+                if (!this.enabled) return;
+                try {
+                    this.init();
+                    if (!this.ctx) return;
+
+                    const now = this.ctx.currentTime;
+                    const fanfare = [523.25, 659.25, 783.99, 1046.5];
+                    fanfare.forEach((freq, i) => {
+                        const osc = this.ctx.createOscillator();
+                        const gain = this.ctx.createGain();
+                        osc.type = "triangle";
+                        osc.frequency.setValueAtTime(freq, now + i * 0.11);
+                        gain.gain.setValueAtTime(0.22, now + i * 0.11);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.11 + 0.35);
+                        osc.connect(gain);
+                        gain.connect(this.ctx.destination);
+                        osc.start(now + i * 0.11);
+                        osc.stop(now + i * 0.11 + 0.36);
+                    });
+                } catch (err) {}
+            }
+        };
+
+        /* ============================================================================
+           3. GAME STATE & STORAGE MANAGEMENT
+        ============================================================================ */
+        const STORAGE_KEY_CUSTOM = "scripture_phrase_custom_words_v2";
+
+        const gameState = {
+            selectedCategory: "all",
+            teamAName: "Team Lions",
+            teamBName: "Team Eagles",
+            scoreA: 0,
+            scoreB: 0,
+            targetScore: 7,
+            baseDuration: 60,
+            timerStyle: "suspense", // "suspense" | "visible"
+            showHints: true,
+            roundNumber: 1,
+            clearedThisRound: 0,
+            isRoundActive: false,
+            deck: [],
+            customWords: [],
+            currentCard: null,
+            // Timer internals
+            roundEndTime: 0,
+            totalRoundMs: 60000,
+            rafId: null,
+            lastTickTime: 0
+        };
+
+        function loadCustomWords() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY_CUSTOM);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (Array.isArray(parsed)) {
+                        gameState.customWords = parsed;
+                    }
+                }
+            } catch (err) {
+                gameState.customWords = [];
+            }
+        }
+
+        function saveCustomWords() {
+            try {
+                localStorage.setItem(STORAGE_KEY_CUSTOM, JSON.stringify(gameState.customWords));
+            } catch (err) {}
+        }
+
+        function getCategoryPool(catId) {
+            const allWords = INITIAL_WORD_BANK.concat(gameState.customWords);
+            if (catId === "all") return allWords;
+            if (catId === "custom") {
+                return gameState.customWords.length > 0 ? gameState.customWords : allWords;
+            }
+            return allWords.filter((item) => item.category === catId);
+        }
+
+        function buildAndShuffleDeck() {
+            const pool = getCategoryPool(gameState.selectedCategory).slice();
+            // Fisher-Yates shuffle
+            for (let i = pool.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                const temp = pool[i];
+                pool[i] = pool[j];
+                pool[j] = temp;
+            }
+            gameState.deck = pool;
+            updateDeckCounters();
+        }
+
+        function getBadgeForCategory(catId) {
+            const found = BIBLE_CATEGORIES.find((c) => c.id === catId);
+            return found ? found.badge : "Scripture Phrase";
+        }
+
+        /* ============================================================================
+           4. UI RENDERING & CATEGORY GRID
+        ============================================================================ */
+        function renderCategoryGrid() {
+            const grid = document.getElementById("category-grid");
+            if (!grid) return;
+            grid.innerHTML = "";
+
+            BIBLE_CATEGORIES.forEach((cat) => {
+                const count = cat.id === "custom"
+                    ? gameState.customWords.length
+                    : getCategoryPool(cat.id).length;
+
+                const isSelected = gameState.selectedCategory === cat.id;
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = isSelected
+                    ? "p-2.5 rounded-2xl border-2 border-amber-400 bg-amber-500/20 text-left transition flex flex-col justify-between cursor-pointer shadow-md"
+                    : "p-2.5 rounded-2xl border border-slate-700/80 bg-slate-800/60 hover:bg-slate-800 text-left transition flex flex-col justify-between cursor-pointer";
+
+                btn.innerHTML = `
+                    <div class="flex items-center justify-between w-full mb-1">
+                        <i class="fa-solid ${cat.icon} ${isSelected ? "text-amber-300" : "text-slate-400"} text-sm"></i>
+                        <span class="text-[10px] font-extrabold px-1.5 py-0.5 rounded-md ${isSelected ? "bg-amber-400 text-slate-950" : "bg-slate-700 text-slate-300"}">${count}</span>
+                    </div>
+                    <div class="text-xs font-bold ${isSelected ? "text-white" : "text-slate-300"} leading-snug">${cat.name}</div>
+                `;
+
+                btn.addEventListener("click", () => {
+                    gameState.selectedCategory = cat.id;
+                    renderCategoryGrid();
+                    updateAvailableWordsBadge();
+                });
+
+                grid.appendChild(btn);
+            });
+
+            updateAvailableWordsBadge();
+        }
+
+        function updateAvailableWordsBadge() {
+            const badge = document.getElementById("available-words-count");
+            if (!badge) return;
+            const count = getCategoryPool(gameState.selectedCategory).length;
+            badge.textContent = `${count} Phrases Ready`;
+        }
+
+        function updateDeckCounters() {
+            const deckBadge = document.getElementById("deck-left-badge");
+            if (deckBadge) {
+                deckBadge.textContent = String(gameState.deck.length);
+            }
+        }
+
+        function updateScoreboardUI() {
+            document.getElementById("score-name-a").textContent = gameState.teamAName;
+            document.getElementById("score-name-b").textContent = gameState.teamBName;
+            document.getElementById("score-val-a").textContent = String(gameState.scoreA);
+            document.getElementById("score-val-b").textContent = String(gameState.scoreB);
+            document.getElementById("round-number-badge").textContent = String(gameState.roundNumber);
+            document.getElementById("ready-round-num").textContent = String(gameState.roundNumber);
+            document.getElementById("goal-score-badge").textContent = String(gameState.targetScore);
+            document.getElementById("award-label-a").textContent = `+1 Pt ${gameState.teamAName}`;
+            document.getElementById("award-label-b").textContent = `+1 Pt ${gameState.teamBName}`;
+            updateDeckCounters();
+        }
+
+        /* ============================================================================
+           5. GAMEPLAY FLOW & HOT-POTATO TIMER ENGINE
+        ============================================================================ */
+        function startMatchFromSetup() {
+            SoundEngine.init();
+
+            const nameA = document.getElementById("input-team-a").value.trim() || "Team Lions";
+            const nameB = document.getElementById("input-team-b").value.trim() || "Team Eagles";
+            gameState.teamAName = nameA;
+            gameState.teamBName = nameB;
+            gameState.baseDuration = parseInt(document.getElementById("select-timer").value, 10) || 60;
+            gameState.targetScore = parseInt(document.getElementById("select-target-score").value, 10) || 7;
+            gameState.timerStyle = document.getElementById("select-timer-style").value || "suspense";
+
+            gameState.scoreA = 0;
+            gameState.scoreB = 0;
+            gameState.roundNumber = 1;
+
+            buildAndShuffleDeck();
+            updateScoreboardUI();
+
+            // Switch screens
+            document.getElementById("screen-setup").classList.add("hidden");
+            document.getElementById("screen-game").classList.remove("hidden");
+            document.getElementById("btn-return-setup").classList.remove("hidden");
+            document.getElementById("btn-return-setup").classList.add("flex");
+
+            showReadySubPanel();
+        }
+
+        function showReadySubPanel() {
+            stopRoundTimer();
+            const catObj = BIBLE_CATEGORIES.find((c) => c.id === gameState.selectedCategory);
+            document.getElementById("ready-category-pill").textContent = catObj ? catObj.name : "All Categories";
+
+            document.getElementById("panel-ready").classList.remove("hidden");
+            document.getElementById("panel-active-play").classList.add("hidden");
+            document.getElementById("panel-buzzer").classList.add("hidden");
+            document.getElementById("panel-victory").classList.add("hidden");
+            updateScoreboardUI();
+        }
+
+        function beginActiveRound() {
+            SoundEngine.init();
+            gameState.isRoundActive = true;
+            gameState.clearedThisRound = 0;
+            document.getElementById("round-cleared-count").textContent = "0";
+
+            // Slight random variance (+/- 5 sec) in suspense mode for true Catch Phrase feel
+            const variance = gameState.timerStyle === "suspense"
+                ? (Math.floor(Math.random() * 11) - 5)
+                : 0;
+            const totalSeconds = Math.max(25, gameState.baseDuration + variance);
+            gameState.totalRoundMs = totalSeconds * 1000;
+            gameState.roundEndTime = performance.now() + gameState.totalRoundMs;
+            gameState.lastTickTime = 0;
+
+            // Configure visible vs suspense countdown UI
+            const progressWrap = document.getElementById("timer-progress-container");
+            const secBadge = document.getElementById("visible-seconds-badge");
+            if (gameState.timerStyle === "visible") {
+                progressWrap.classList.remove("hidden");
+                secBadge.classList.remove("hidden");
+            } else {
+                progressWrap.classList.add("hidden");
+                secBadge.classList.add("hidden");
+            }
+
+            document.getElementById("panel-ready").classList.add("hidden");
+            document.getElementById("panel-buzzer").classList.add("hidden");
+            document.getElementById("panel-victory").classList.add("hidden");
+            document.getElementById("panel-active-play").classList.remove("hidden");
+
+            drawNextCard();
+            startTimerLoop();
+        }
+
+        function drawNextCard() {
+            if (gameState.deck.length === 0) {
+                buildAndShuffleDeck();
+            }
+            gameState.currentCard = gameState.deck.pop();
+            renderCurrentCard();
+            updateDeckCounters();
+        }
+
+        function renderCurrentCard() {
+            const card = gameState.currentCard;
+            if (!card) return;
+
+            const badgeSpan = document.getElementById("card-category-badge").querySelector("span");
+            badgeSpan.textContent = getBadgeForCategory(card.category);
+
+            document.getElementById("card-phrase-text").textContent = card.text;
+
+            const hintEl = document.getElementById("card-hint-text");
+            if (card.hint && gameState.showHints) {
+                hintEl.textContent = card.hint;
+                hintEl.classList.remove("hidden");
+            } else {
+                hintEl.classList.add("hidden");
+            }
+        }
+
+        function handleGotIt() {
+            if (!gameState.isRoundActive) return;
+            SoundEngine.playGotIt();
+            gameState.clearedThisRound += 1;
+            document.getElementById("round-cleared-count").textContent = String(gameState.clearedThisRound);
+            drawNextCard();
+        }
+
+        function handleSkipWord() {
+            if (!gameState.isRoundActive) return;
+            SoundEngine.playSkip();
+            drawNextCard();
+        }
+
+        function startTimerLoop() {
+            // Only cancel any old animation frame here. Calling stopRoundTimer() would also
+            // set isRoundActive = false, which froze the timer and disabled GOT IT / SKIP.
+            if (gameState.rafId) {
+                cancelAnimationFrame(gameState.rafId);
+                gameState.rafId = null;
+            }
+
+            function tickFrame(now) {
+                if (!gameState.isRoundActive) return;
+
+                const remainingMs = gameState.roundEndTime - now;
+                if (remainingMs <= 0) {
+                    triggerBuzzerTimeUp();
+                    return;
+                }
+
+                const elapsedRatio = 1 - (remainingMs / gameState.totalRoundMs);
+
+                // Determine urgency tier (0: steady, 1: medium, 2: fast, 3: frantic)
+                let tickInterval = 950;
+                let urgencyLevel = 0;
+                let statusText = "Timer Ticking...";
+                let dotClass = "w-3 h-3 rounded-full bg-emerald-400 inline-block shadow-sm";
+
+                if (elapsedRatio > 0.82) {
+                    tickInterval = 220;
+                    urgencyLevel = 3;
+                    statusText = "HURRY! PASS IT NOW!";
+                    dotClass = "w-3 h-3 rounded-full bg-rose-500 inline-block shadow-sm animate-ping";
+                } else if (elapsedRatio > 0.60) {
+                    tickInterval = 390;
+                    urgencyLevel = 2;
+                    statusText = "Speeding Up!";
+                    dotClass = "w-3 h-3 rounded-full bg-amber-400 inline-block shadow-sm";
+                } else if (elapsedRatio > 0.35) {
+                    tickInterval = 620;
+                    urgencyLevel = 1;
+                    statusText = "Keep Guessing!";
+                    dotClass = "w-3 h-3 rounded-full bg-amber-300 inline-block shadow-sm";
+                }
+
+                // Update visible countdown bar if enabled
+                if (gameState.timerStyle === "visible") {
+                    const pct = Math.max(0, Math.min(100, (remainingMs / gameState.totalRoundMs) * 100));
+                    document.getElementById("timer-progress-bar").style.width = `${pct}%`;
+                    document.getElementById("visible-seconds-badge").textContent = `${Math.ceil(remainingMs / 1000)}s`;
+                }
+
+                // Fire rhythmic tick sound and card pulse
+                if (now - gameState.lastTickTime >= tickInterval) {
+                    gameState.lastTickTime = now;
+                    SoundEngine.playTick(urgencyLevel);
+                    pulseCardVisual(urgencyLevel);
+                    document.getElementById("tempo-status-label").textContent = statusText;
+                    document.getElementById("tick-indicator-dot").className = dotClass;
+                }
+
+                gameState.rafId = requestAnimationFrame(tickFrame);
+            }
+
+            gameState.rafId = requestAnimationFrame(tickFrame);
+        }
+
+        function pulseCardVisual(urgencyLevel) {
+            const cardEl = document.getElementById("phrase-card");
+            if (!cardEl) return;
+            const pulseClass = urgencyLevel >= 2 ? "card-urgent-pulse" : "card-tick-pulse";
+            cardEl.classList.add(pulseClass);
+            setTimeout(() => {
+                cardEl.classList.remove("card-tick-pulse", "card-urgent-pulse");
+            }, 130);
+        }
+
+        function stopRoundTimer() {
+            gameState.isRoundActive = false;
+            if (gameState.rafId) {
+                cancelAnimationFrame(gameState.rafId);
+                gameState.rafId = null;
+            }
+        }
+
+        function triggerBuzzerTimeUp() {
+            stopRoundTimer();
+            SoundEngine.playBuzzer();
+
+            const container = document.getElementById("app-container");
+            container.classList.add("animate-buzzer");
+            setTimeout(() => container.classList.remove("animate-buzzer"), 650);
+
+            const lastPhrase = gameState.currentCard ? gameState.currentCard.text : "None";
+            document.getElementById("buzzer-last-word").textContent = `"${lastPhrase}"`;
+
+            document.getElementById("panel-active-play").classList.add("hidden");
+            document.getElementById("panel-buzzer").classList.remove("hidden");
+        }
+
+        function awardPointToTeam(team) {
+            if (team === "A") {
+                gameState.scoreA += 1;
+            } else if (team === "B") {
+                gameState.scoreB += 1;
+            }
+            gameState.roundNumber += 1;
+            updateScoreboardUI();
+
+            // Check for match winner
+            if (gameState.scoreA >= gameState.targetScore || gameState.scoreB >= gameState.targetScore) {
+                showVictoryScreen();
+            } else {
+                showReadySubPanel();
+            }
+        }
+
+        function showVictoryScreen() {
+            SoundEngine.playVictory();
+            const winnerName = gameState.scoreA >= gameState.targetScore
+                ? gameState.teamAName
+                : gameState.teamBName;
+
+            document.getElementById("victory-team-title").textContent = `${winnerName} Wins!`;
+            document.getElementById("victory-final-score").textContent =
+                `Final Score: ${gameState.teamAName} (${gameState.scoreA}) - ${gameState.teamBName} (${gameState.scoreB})`;
+
+            document.getElementById("panel-ready").classList.add("hidden");
+            document.getElementById("panel-active-play").classList.add("hidden");
+            document.getElementById("panel-buzzer").classList.add("hidden");
+            document.getElementById("panel-victory").classList.remove("hidden");
+        }
+
+        /* ============================================================================
+           6. CUSTOM WORDS MODAL MANAGEMENT
+        ============================================================================ */
+        function renderCustomWordsList() {
+            const listEl = document.getElementById("custom-words-list");
+            if (!listEl) return;
+            listEl.innerHTML = "";
+
+            if (gameState.customWords.length === 0) {
+                listEl.innerHTML = `<div class="text-xs text-slate-500 text-center py-4">No custom phrases added yet.</div>`;
+                return;
+            }
+
+            gameState.customWords.forEach((item, index) => {
+                const row = document.createElement("div");
+                row.className = "flex items-center justify-between bg-slate-800/80 border border-slate-700/80 rounded-xl px-3 py-2 text-xs";
+
+                const textWrap = document.createElement("div");
+                textWrap.className = "truncate pr-2";
+
+                const titleSpan = document.createElement("span");
+                titleSpan.className = "font-bold text-amber-300";
+                titleSpan.textContent = item.text;
+                textWrap.appendChild(titleSpan);
+
+                if (item.hint) {
+                    const hintSpan = document.createElement("span");
+                    hintSpan.className = "text-slate-400 ml-2";
+                    hintSpan.textContent = `(${item.hint})`;
+                    textWrap.appendChild(hintSpan);
+                }
+
+                const delBtn = document.createElement("button");
+                delBtn.type = "button";
+                delBtn.className = "text-rose-400 hover:text-rose-300 px-2 py-1";
+                delBtn.innerHTML = `<i class="fa-solid fa-trash-can"></i>`;
+                delBtn.addEventListener("click", () => {
+                    gameState.customWords.splice(index, 1);
+                    saveCustomWords();
+                    renderCustomWordsList();
+                    renderCategoryGrid();
+                });
+
+                row.appendChild(textWrap);
+                row.appendChild(delBtn);
+                listEl.appendChild(row);
+            });
+        }
+
+        function addCustomWordFromInput() {
+            const phraseInput = document.getElementById("input-custom-phrase");
+            const hintInput = document.getElementById("input-custom-hint");
+            const text = phraseInput.value.trim();
+            const hint = hintInput.value.trim();
+
+            if (!text) return;
+
+            const newEntry = {
+                text: text,
+                category: "custom",
+                hint: hint || "Custom Youth Group Phrase"
+            };
+
+            gameState.customWords.unshift(newEntry);
+            gameState.deck.push(newEntry);
+            saveCustomWords();
+
+            phraseInput.value = "";
+            hintInput.value = "";
+            renderCustomWordsList();
+            renderCategoryGrid();
+            updateDeckCounters();
+        }
+
+        /* ============================================================================
+           7. EVENT LISTENERS & INITIALIZATION
+        ============================================================================ */
+        function initScripturePhraseApp() {
+            if (window.__scripturePhraseInitDone) return;
+            window.__scripturePhraseInitDone = true;
+            loadCustomWords();
+            renderCategoryGrid();
+            renderCustomWordsList();
+
+            // Main Setup -> Start Match
+            document.getElementById("btn-start-match").addEventListener("click", startMatchFromSetup);
+
+            // Return to Setup
+            document.getElementById("btn-return-setup").addEventListener("click", () => {
+                stopRoundTimer();
+                document.getElementById("screen-game").classList.add("hidden");
+                document.getElementById("screen-setup").classList.remove("hidden");
+                document.getElementById("btn-return-setup").classList.add("hidden");
+                document.getElementById("btn-return-setup").classList.remove("flex");
+                renderCategoryGrid();
+            });
+
+            // Ready -> Begin Timer
+            document.getElementById("btn-begin-timer").addEventListener("click", beginActiveRound);
+
+            // Gameplay Actions
+            document.getElementById("btn-got-it").addEventListener("click", handleGotIt);
+            document.getElementById("btn-skip-word").addEventListener("click", handleSkipWord);
+
+            // Toggle Hint Visibility
+            document.getElementById("btn-toggle-hint").addEventListener("click", () => {
+                gameState.showHints = !gameState.showHints;
+                document.getElementById("hint-toggle-text").textContent = gameState.showHints ? "Hide Hint" : "Show Hint";
+                renderCurrentCard();
+            });
+
+            // Buzzer Point Awarding
+            document.getElementById("btn-award-team-a").addEventListener("click", () => awardPointToTeam("A"));
+            document.getElementById("btn-award-team-b").addEventListener("click", () => awardPointToTeam("B"));
+            document.getElementById("btn-replay-no-point").addEventListener("click", () => showReadySubPanel());
+
+            // Victory Screen Buttons
+            document.getElementById("btn-play-again").addEventListener("click", () => {
+                gameState.scoreA = 0;
+                gameState.scoreB = 0;
+                gameState.roundNumber = 1;
+                if (gameState.deck.length < 15) {
+                    buildAndShuffleDeck();
+                }
+                updateScoreboardUI();
+                showReadySubPanel();
+            });
+
+            document.getElementById("btn-victory-setup").addEventListener("click", () => {
+                stopRoundTimer();
+                document.getElementById("screen-game").classList.add("hidden");
+                document.getElementById("screen-setup").classList.remove("hidden");
+                document.getElementById("btn-return-setup").classList.add("hidden");
+            });
+
+            // Sound Toggle
+            document.getElementById("btn-sound-toggle").addEventListener("click", () => {
+                SoundEngine.enabled = !SoundEngine.enabled;
+                const icon = document.getElementById("sound-icon");
+                const label = document.getElementById("sound-label");
+                if (SoundEngine.enabled) {
+                    icon.className = "fa-solid fa-volume-high";
+                    label.textContent = "Sound On";
+                    SoundEngine.playGotIt();
+                } else {
+                    icon.className = "fa-solid fa-volume-xmark text-slate-400";
+                    label.textContent = "Muted";
+                }
+            });
+
+            // Rules Modal
+            const rulesModal = document.getElementById("modal-rules");
+            document.getElementById("btn-open-rules").addEventListener("click", () => {
+                rulesModal.classList.remove("hidden");
+                rulesModal.classList.add("flex");
+            });
+            const closeRules = () => {
+                rulesModal.classList.add("hidden");
+                rulesModal.classList.remove("flex");
+            };
+            document.getElementById("btn-close-rules").addEventListener("click", closeRules);
+            document.getElementById("btn-got-rules").addEventListener("click", closeRules);
+
+            // Custom Words Modal
+            const customModal = document.getElementById("modal-custom");
+            document.getElementById("btn-open-custom").addEventListener("click", () => {
+                renderCustomWordsList();
+                customModal.classList.remove("hidden");
+                customModal.classList.add("flex");
+            });
+            const closeCustom = () => {
+                customModal.classList.add("hidden");
+                customModal.classList.remove("flex");
+            };
+            document.getElementById("btn-close-custom").addEventListener("click", closeCustom);
+            document.getElementById("btn-done-custom").addEventListener("click", closeCustom);
+            document.getElementById("btn-add-custom-word").addEventListener("click", addCustomWordFromInput);
+            document.getElementById("input-custom-phrase").addEventListener("keydown", (e) => {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    addCustomWordFromInput();
+                }
+            });
+            document.getElementById("btn-clear-custom").addEventListener("click", () => {
+                gameState.customWords = [];
+                saveCustomWords();
+                renderCustomWordsList();
+                renderCategoryGrid();
+            });
+
+            // Keyboard Shortcuts during active round (Space/Enter = Got It, S/RightArrow = Skip)
+            window.addEventListener("keydown", (e) => {
+                if (!gameState.isRoundActive) return;
+                const tag = document.activeElement ? document.activeElement.tagName : "";
+                if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+
+                if (e.code === "Space" || e.code === "Enter") {
+                    e.preventDefault();
+                    handleGotIt();
+                } else if (e.code === "KeyS" || e.code === "ArrowRight") {
+                    e.preventDefault();
+                    handleSkipWord();
+                }
+            });
+        }
+
+        // Run setup now if the page is already loaded (preview apps / viewers often load
+        // the page late, so DOMContentLoaded never fires and the buttons stay dead).
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", initScripturePhraseApp);
+        } else {
+            initScripturePhraseApp();
+        }
+    </script>
+</body>
+</html>
